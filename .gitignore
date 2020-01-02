@@ -1,0 +1,3 @@
+#Ignoring file with group_id and pass
+conf.txt
+sqlpass.txt
