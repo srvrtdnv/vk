@@ -60,7 +60,7 @@ public class OptionsListCommandHandler extends MessageHandler{
 						while (rs.next()) {
 							int direction = rs.getInt("direction");
 							sb2.append("Направление: ");
-							sb1.append(Fleight.getDirectionString(direction));
+							sb2.append(Fleight.getDirectionString(direction));
 							sb2.append("\nВремя: ");
 							Integer time = rs.getInt("time");
 							Integer minutes = time % 60;

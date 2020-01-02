@@ -227,7 +227,13 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 			Integer[] ids = new Integer[userIds.size()];
 			for (int index = 0; index < ids.length; index++) {
 				ids[index] = Integer.parseInt(userIds.get(index));
+				this.sendText(new MessageStandardClass(message.getText(), userIds.get(index), "vk", null));
 			}
+			return 1;
+			/*
+			 * непонятный результат работы метода
+			 * сообщения от него то приходят
+			 * то не приходят
 			MessagesSendQueryWithUserIds msgSend = vk.messages().sendWithUserIds(getNextActor(), ids).randomId(getNextRandId(message.getUserId())).message(message.getText()).groupId(groupActor.getGroupId());
 			if (message.isKeyboardOn()) {
 				msgSend.keyboard(createKeyboard(message.getText()));
@@ -238,6 +244,7 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 			}
 			msgSend.execute();
 			return 1;
+			*/
 		} catch (Exception e) {
 			System.out.println(e);
 		}

@@ -62,7 +62,43 @@ public class Fleight implements Deletable {
 		request.putValue("day", "" + day);
 		int result = request.execute();
 		if (result < 1) return -1;
+		SelectSQLRequest selectRequest = new SelectSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).addSelectingField("user_id").setWhereFields("time_from < " + time + " AND time_to > " + time + " AND direction = " + direction + " AND day = " + day);
+		RowArray res = selectRequest.execute();
+		List<String> userIds = new ArrayList<String>();
+		while (res.next()) {
+			userIds.add(res.getString("user_id"));
+		}
+		if (userIds.size() > 0) pCenter.setStateWithUserIds(messenger, userIds, new State("saved state", false).setMessage("Автоуведомление.\n" + this.getFullInfo().replaceAll("Автопубликация.*", "")).setHandler(new BackCommandHandler().setNext(new MainMenuCommandHandler().setNext(new UnknownCommandHandler()))));
 		if (isAutoPostOn) {
+			String nextDay = "";
+			switch (new Date().getDay()) {
+			case 6:
+				nextDay = "вс";
+				break;
+			case 0:
+				nextDay = "пн";
+				break;
+			case 1:
+				nextDay = "вт";
+				break;
+			case 2:
+				nextDay = "ср";
+				break;
+			case 3:
+				nextDay = "чт";
+				break;
+			case 4:
+				nextDay = "пт";
+				break;
+			case 5:
+				nextDay = "сб";
+				break;
+			}
+			if (autoPostDays.contains(nextDay) && day != 2) {
+				Fleight flight = new Fleight().setDay(2).setTime(time).setDirection(direction).setNote(note).setNumber(number).setUserId(userId).setAutoPostOn(false);
+				if (!flight.isExist()) result = flight.post(messenger); 
+				if (result < 1) return -1;
+			}
 			request.clearValues();
 			request.setTableName("auto_post");
 			request.putValue("time", "" + time);
@@ -77,13 +113,6 @@ public class Fleight implements Deletable {
 		}
 		InsertOnDuplicateKeySQLRequest insRequest = new InsertOnDuplicateKeySQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setPrimData("user_id", "\"" + userId + "\"").putValue("saved_number", "\"" + number + "\"").putValue("saved_note",  "\"" + note + "\"");
 		insRequest.execute();
-		SelectSQLRequest selectRequest = new SelectSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).addSelectingField("user_id").setWhereFields("time_from < " + time + " AND time_to > " + time + " AND direction = " + direction + " AND day = " + day);
-		RowArray res = selectRequest.execute();
-		List<String> userIds = new ArrayList<String>();
-		while (res.next()) {
-			userIds.add(res.getString("user_id"));
-		}
-		if (userIds.size() > 0) pCenter.setStateWithUserIds(messenger, userIds, new State("saved state", false).setMessage("Автоуведомление.\n" + this.getFullInfo()).setHandler(new BackCommandHandler().setNext(new MainMenuCommandHandler().setNext(new UnknownCommandHandler()))));
 		return result;
 	}
 	
@@ -200,8 +229,9 @@ public class Fleight implements Deletable {
 		return this;
 	}
 
-	public void setAutoPostDays(String autoPostDays) {
+	public Fleight setAutoPostDays(String autoPostDays) {
 		this.autoPostDays = autoPostDays;
+		return this;
 	}
 
 	public Fleight setNote(String note) {
@@ -214,12 +244,14 @@ public class Fleight implements Deletable {
 		return this;
 	}
 
-	public void setFrequency(boolean frequency) {
+	public Fleight setFrequency(boolean frequency) {
 		this.frequency = frequency;
+		return this;
 	}
 
-	public void setAutoPostOn(boolean isAutoPostOn) {
+	public Fleight setAutoPostOn(boolean isAutoPostOn) {
 		this.isAutoPostOn = isAutoPostOn;
+		return this;
 	}
 
 	public Fleight setUserId(String userId) {

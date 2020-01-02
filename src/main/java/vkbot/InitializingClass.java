@@ -3,12 +3,21 @@ package vkbot;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
+
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.httpclient.*;
 
 import vkbot.handlers.*;
+import vkbot.jobs.TablesUpdatingJob;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 import vkbot.state.ErrorState;
@@ -273,6 +282,7 @@ public class InitializingClass {
 					fleight.setAutoPostOn(true);
 					if (fleight.isAutoPostExist()) {
 						State err = new ErrorState().setMessage("Автопубликация в этом направлении уже активирована.").setPrevState(state).setNextHandler(new BackCommandHandler());
+						fleight.setAutoPostOn(false);
 						pCenter.setSavedState(userId, err);
 						pCenter.setState(messenger, userId, err);
 						return -1;
@@ -383,6 +393,16 @@ public class InitializingClass {
 		
 		State mainMenu = new State("", "Главное меню. Выбери нужное, отправив соответствующее сообщение:", new OptionsListCommandHandler().setNext(new SelectMenuItemCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new FastCreateFleightCommandHandler()).setNext(new FastFleightFindCommandHandler()), true);
 		mainMenu.setName("Главное меню").setIsMainMenuButtonOn(false).setIsBackButtonOn(false);
+		mainMenu.setNextHandler(new MessageHandler() {
+
+			@Override
+			public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
+				ProcessingCenter pCenter = ProcessingCenter.getInstance();
+				pCenter.setState(messenger, message.getUserId(), state);
+				return 1;
+			}
+			
+		});
 		nullState.addState(mainMenu);
 		
 			/*
@@ -682,7 +702,11 @@ public class InitializingClass {
 			GroupActor actor = new GroupActor(189799593, reader.readLine());
 			System.out.println(ProcessingCenter.getInstance());
 			Bot bot = new Bot(vk, actor);
-			System.out.println("start");
+			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+			Trigger dailyTrigger = TriggerBuilder.newTrigger().withIdentity("midnightTrigger", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ? *")).build();
+			JobDetail jDetail = JobBuilder.newJob(TablesUpdatingJob.class).withIdentity("tablesUpdating", "myFirstGroup").build();
+			scheduler.start();
+			scheduler.scheduleJob(jDetail, dailyTrigger);
 			reader.close();
 			bot.run();
 		} catch (Exception e) {

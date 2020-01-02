@@ -33,11 +33,11 @@ public class SelectSQLRequest extends AbstractSQLRequest<RowArray> {
 			for (int index = 1; index < this.selectingFields.size(); index++) {
 				selectingFields += "," + this.selectingFields.get(index);
 			}
-			
-			String request = "SELECT " + selectingFields + " FROM " + this.getTableName() + " WHERE " + this.whereFields + ";";
+			String request = "SELECT " + selectingFields + " FROM " + this.getTableName();
+			if (!(this.whereFields == null || this.whereFields.equals(""))) request += " WHERE " + this.whereFields + ";";
+			else request += ";";
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery(request);
-			//System.out.println(result.getMetaData().getColumnCount());
 			RowArray res = this.convertResultSet(result);
 			connection.close();
 			return res;

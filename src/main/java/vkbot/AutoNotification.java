@@ -13,7 +13,6 @@ public class AutoNotification implements Deletable {
 		ProcessingCenter pCenter = ProcessingCenter.getInstance();
 		DeleteSQLRequest request = new DeleteSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields(" id = " + this.getId());
 		int result = request.execute();
-		System.out.println("DELETE ID: " + getId());
 		return result;
 	}
 	

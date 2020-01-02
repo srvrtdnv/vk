@@ -26,7 +26,10 @@ public class DeleteSQLRequest extends AbstractSQLRequest<Integer> {
 			reader.close();
 			Connection connection = DriverManager.getConnection(getUrl() + getDatabase(), getUsername(), pass);
 			Statement statement = connection.createStatement();
-			Integer result = statement.executeUpdate("DELETE FROM " + getTableName() + " WHERE " + whereFields + ";");
+			String request = "DELETE FROM " + getTableName();
+			if (!(this.whereFields == null || this.whereFields.equals(""))) request += " WHERE " + this.whereFields + ";";
+			else request += ";";
+			Integer result = statement.executeUpdate(request);
 			connection.close();
 			return result;
 		} catch(Exception e) {
