@@ -13,7 +13,7 @@ import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 import vkbot.sql.UpdateSQLRequest;
 
-public class DatabasesUpdatingJob implements Job {
+public class TablesUpdatingJob implements Job {
 	
 
 	@Override
@@ -65,12 +65,13 @@ public class DatabasesUpdatingJob implements Job {
 		while (response.next()) {
 			String days = response.getString("days").toLowerCase();
 			if (days.contains(nextDay)) {
-				Fleight flight = new Fleight().setDirection(response.getInt("direction")).setDay(2).setTime(response.getInt("time")).setUserId(response.getString("user_id")).setNote(response.getString("number")).setNote(response.getString("note"));
+				Fleight flight = new Fleight().setDirection(response.getInt("direction")).setDay(2).setTime(response.getInt("time")).setUserId(response.getString("user_id")).setNumber(response.getString("number")).setNote(response.getString("note"));
 				flight.post();
 			}
 		}
 		pCenter.clearAllMaps();
 		pCenter.setIsMaintenance(false);
+		System.out.println("Tables updating complete");
 	}
 
 }
