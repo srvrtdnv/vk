@@ -708,6 +708,7 @@ public class InitializingClass {
 			scheduler.start();
 			scheduler.scheduleJob(jDetail, dailyTrigger);
 			reader.close();
+			bot.uploadGroupActors("conf.txt");
 			bot.run();
 		} catch (Exception e) {
 			System.out.println(e);

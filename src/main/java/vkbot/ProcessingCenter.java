@@ -8,7 +8,6 @@ import java.util.List;
 import vkbot.handlers.*;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
-import vkbot.state.MaintenanceState;
 import vkbot.state.NullState;
 import vkbot.state.State;
 
@@ -41,7 +40,8 @@ public class ProcessingCenter {
 	public void startProcessing(SimpleMessenger messenger, MessageStandardClass message) throws SQLException {
 		try {
 			if (isMaintenance) {
-				this.setState(messenger, message.getUserId(), new MaintenanceState());
+				State maintenanceState = new State("", false).setMessage("На сервере идут ежедневные технические работы. Попробуй отправить любое сообщение через 10-15 сек.").setIsMainMenuButtonOn(false).setIsBackButtonOn(false).setIsKeyboardOn(false);
+				this.setState(messenger, message.getUserId(), maintenanceState);
 				return;
 			}
 			this.isHereIncompletedProcess = true;

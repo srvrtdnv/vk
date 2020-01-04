@@ -6,6 +6,8 @@ import java.io.FileReader;
 import com.vk.api.sdk.callback.longpoll.CallbackApiLongPoll;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
+import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.messages.Keyboard;
 import com.vk.api.sdk.objects.messages.KeyboardButton;
 import com.vk.api.sdk.objects.messages.KeyboardButtonAction;
@@ -14,8 +16,9 @@ import com.vk.api.sdk.objects.messages.KeyboardButtonColor;
 import com.vk.api.sdk.objects.messages.Message;
 import com.vk.api.sdk.objects.messages.MessageAttachment;
 import com.vk.api.sdk.queries.messages.MessagesSendQuery;
-import com.vk.api.sdk.queries.messages.MessagesSendQueryWithUserIds;
 
+import vkbot.jobs.RandIdTableUpdatingJob;
+import vkbot.sql.InsertOnDuplicateKeySQLRequest;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 
@@ -23,14 +26,39 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
+
 public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 
 	private GroupActor groupActor;
 	private VkApiClient vk;
 	private ProcessingCenter pCenter;
 	private int actorIndex = 0;
-	private ArrayList<GroupActor> actors= new ArrayList<GroupActor>();
-	private Map<String, Integer> randIds = new HashMap<String, Integer>();
+	private static ArrayList<GroupActor> actors= new ArrayList<GroupActor>();
+	private static Map<String, Integer> randIds = new HashMap<String, Integer>();
+	
+	static {
+		try {
+			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+			Trigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0/3 * * * ? *")).build();
+			JobDataMap jDMap = new JobDataMap();
+			jDMap.put("randIdMap", Bot.randIds);
+			JobDetail jDetail = JobBuilder.newJob(RandIdTableUpdatingJob.class).setJobData(jDMap).withIdentity("randIdUpdating", "myFristGroup").build();
+			scheduler.start();
+			scheduler.scheduleJob(jDetail, trigger);
+			System.out.println("started");
+		} catch (SchedulerException e) {
+			System.out.println("error " + e);
+		}
+	}
 	
 	public Bot(VkApiClient client, GroupActor actor) {
 		super(client, actor, 25);
@@ -136,29 +164,30 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 	
 	public GroupActor getNextActor() {
 		int size = actors.size();
-		if (size > 0) {
-			GroupActor actor = actors.get(actorIndex);
-			actorIndex = (actorIndex + 1) % size;
+		if (size > 0 && actorIndex > 0) {
+			GroupActor actor = actors.get(actorIndex - 1);
+			actorIndex = (actorIndex + 1) % (size + 1);
 			return actor;
 		}
+		actorIndex = 1;
 		return groupActor;
 	}
 	
 	public Integer getNextRandId(String userId) {
-		if (!this.randIds.containsKey(userId)) {
+		if (!Bot.randIds.containsKey(userId)) {
 			SelectSQLRequest request = new SelectSQLRequest("vk_bot", "rand_id", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = \"" + userId + "\"").addSelectingField("random_id");
 			RowArray response = request.execute();
 			if (response.next()) {
-				this.randIds.put(userId, Integer.parseInt(response.getString("random_id")) + 1);
+				Bot.randIds.put(userId, Integer.parseInt(response.getString("random_id")) + 1);
 				return Integer.parseInt(response.getString("random_id")) + 1;
 			}
 			else { 
-				this.randIds.put(userId, 1);
+				Bot.randIds.put(userId, 1);
 				return 1;
 			}
 		}
-		int res = this.randIds.get(userId) + 1;
-		this.randIds.put(userId, res);
+		int res = Bot.randIds.get(userId) + 1;
+		Bot.randIds.put(userId, res);
 		return res;
 	}
 	
@@ -250,4 +279,5 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 		}
 		return -1;
 	}
+	
 }
