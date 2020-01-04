@@ -502,7 +502,7 @@ public class InitializingClass {
 								}.setNext(noteHandler));
 								nullState.addState(state);
 								
-									state = new State("1.1.1.1.1.1.1", "Выбери нужный вариант. При выборе варианта \"На текущую неделю\" функция будет активирована до конца текущей недели, а не на следующие 7 дней.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), true) {
+									state = new State("1.1.1.1.1.1.1", "Выбери нужный вариант. При выборе варианта \"На текущую неделю\" функция будет активирована до конца текущей недели, а не на следующие 7 дней.\n\nПримечание: если ты добавляешь автопубликацию на текующую неделю в воскресенье, то она переходит на следующую неделю. Сделано это для того, чтобы тебе не приходилось в понедельник лишний раз заходить и включать автопубликацию, если ты в воскресенье публикуешь на понедельник поездку и хочешь включить на следующую неделю опцию.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), true) {
 										
 										@Override
 										public String buildText() {
@@ -552,7 +552,7 @@ public class InitializingClass {
 									});
 									nullState.addState(state);
 									
-										state = new State("1.1.1.1.1.1.1.1", "Введи через пробел необходимые дни недели для публикации. Для ввода нужно использовать только следующие сокращения: понедельник - пн, вторник - вт, среда - ср, четверг - чт, пятница - пт, суббота - сб, воскресенье - вс.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), false);
+										state = new State("1.1.1.1.1.1.1.1", "Введи через пробел необходимые дни недели для публикации. Для ввода нужно использовать только следующие сокращения: понедельник - пн, вторник - вт, среда - ср, четверг - чт, пятница - пт, суббота - сб, воскресенье - вс.\n\nПримечание: дни недели вводятся одним сообщением, в дальнейшем дополнить их пока невозможно.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), false);
 										state.setName("Выбрать частоту");
 										state.setNextHandler(weekDaysCommandHandler);
 										nullState.addState(state);

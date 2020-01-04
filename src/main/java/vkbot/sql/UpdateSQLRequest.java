@@ -42,7 +42,6 @@ public class UpdateSQLRequest extends AbstractSQLRequest<Integer> {
 			connection.close();
 			return result;
 		} catch (Exception e) {
-			System.out.println("" + e);
 		}
 		return -1;
 	}

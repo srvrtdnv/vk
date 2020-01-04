@@ -45,7 +45,6 @@ public class InsertOnDuplicateKeySQLRequest extends AbstractSQLRequest<Integer> 
 			connection.close();
 			return result;
 		} catch (Exception e) {
-			System.out.println("INSERT ON UPDATE: " + e);
 		}
 		return -1;
 	}

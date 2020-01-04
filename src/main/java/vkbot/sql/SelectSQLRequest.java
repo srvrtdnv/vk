@@ -42,7 +42,6 @@ public class SelectSQLRequest extends AbstractSQLRequest<RowArray> {
 			connection.close();
 			return res;
 		} catch (Exception e) {
-			System.out.println("SelectSQL. " + e);
 		}
 		
 		return null;

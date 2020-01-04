@@ -33,7 +33,6 @@ public class DeleteSQLRequest extends AbstractSQLRequest<Integer> {
 			connection.close();
 			return result;
 		} catch(Exception e) {
-			System.out.println("DELETE SQL: " + whereFields + "\n" + e);
 		}
 		return -1;
 	}

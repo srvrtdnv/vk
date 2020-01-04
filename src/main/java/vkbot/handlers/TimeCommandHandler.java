@@ -33,9 +33,6 @@ public class TimeCommandHandler extends MessageHandler {
 			int accuracyPlus = 30;
 			int accuracyMinus = 30;
 			
-			if (hours < 0 || hours > 23 || minutes > 59 || minutes < 0) {
-				return this.getNext().handle(messenger, message, state);
-			}
 			
 			if (array.length > 1) {
 				if (array[1].contains("+")) {
@@ -54,6 +51,9 @@ public class TimeCommandHandler extends MessageHandler {
 				} else {
 					this.getNext().handle(messenger, message, state);
 				}
+			}
+			if (hours < 0 || hours > 23 || minutes > 59 || minutes < 0 || accuracyMinus > 120 || accuracyPlus > 120) {
+				return this.getNext().handle(messenger, message, state);
 			}
 			int time = hours * 60 + minutes;
 			Fleight fleight;
@@ -113,9 +113,9 @@ public class TimeCommandHandler extends MessageHandler {
 			resultState.addState(fis);
 		}
 		if (resultState.getStatesArraySize() == 1) {
-			resultState.setMessage("В заданный промежуток времени поездки отсутствуют");
+			resultState.setMessage("В заданный промежуток времени поездки отсутствуют.");
 		} else {
-			resultState.setMessage("Ниже представлены все найденные поездки:");
+			resultState.setMessage("Ниже представлены все найденные поездки (если тебя просят отправить предоплату - перед тобой скорее всего мошенник):");
 		}
 		resultState.setNextHandler(new SetAutoNotificationCommandHandler()).get(0).setFullId("saved state");
 		return resultState;

@@ -42,7 +42,6 @@ public class InsertSQLRequest extends AbstractSQLRequest<Integer> {
 			connection.close();
 			return result;
 		} catch(Exception e) {
-			System.out.println("INSERT ERROR: " + e);
 		}
 		return -1;
 	}

@@ -54,9 +54,7 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 			JobDetail jDetail = JobBuilder.newJob(RandIdTableUpdatingJob.class).setJobData(jDMap).withIdentity("randIdUpdating", "myFristGroup").build();
 			scheduler.start();
 			scheduler.scheduleJob(jDetail, trigger);
-			System.out.println("started");
 		} catch (SchedulerException e) {
-			System.out.println("error " + e);
 		}
 	}
 	

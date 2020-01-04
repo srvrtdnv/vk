@@ -132,17 +132,62 @@ public class Fleight implements Deletable {
 	public List<FleightInfoState> find() {
 		List<FleightInfoState> result = new ArrayList<FleightInfoState>();
 		ProcessingCenter pCenter = ProcessingCenter.getInstance();
-		SelectSQLRequest request = new SelectSQLRequest("vk_bot", "flights", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("direction = " + this.direction + " AND day = " + this.day + " AND time > " + (this.time - this.accuracyMinus) + " AND time < " + (this.time + this.accuracyPlus)).addSelectingField("*");
-		RowArray response = request.execute();
-		while (response.next()) {
-			int intTime = Integer.parseInt(response.getString("time"));
-			String minutes = (intTime % 60) < 10 ? "0" + (intTime % 60) : "" + (intTime % 60);
-			String time = Integer.toString(intTime / 60) + ":" + minutes;
-			String userId = response.getString("user_id");
-			String number = response.getString("number");
-			String note = response.getString("note");
-			String name = "Время: " + time + "\nСтраница ВК: https://vk.com/" + userId + "\nНомер: " + number + "\nЗаметка: " + note;
-			result.add((FleightInfoState) new FleightInfoState().setName(name));
+		if (this.time < this.accuracyMinus) {
+			int curTimeMinus = this.accuracyMinus;
+			int curTimePlus = this.accuracyPlus;
+			int curTime = this.time;
+			if (this.day > 1) {
+				int curDay = this.day;
+				this.setDay(curDay - 1);
+				this.setAccuracyMinus(this.accuracyMinus - this.time - 1);
+				this.setTime(23 * 60 + 59);
+				this.setAccuracyPlus(0);
+				result = this.find();
+				this.setDay(curDay);
+			}
+			this.setTime(0);
+			this.setAccuracyMinus(0);
+			this.setAccuracyPlus(curTime + curTimePlus);
+			result.addAll(this.find());
+			this.setTime(curTime);
+			this.setAccuracyMinus(curTimeMinus);
+			this.setAccuracyPlus(curTimePlus);
+		}
+		if ((23 * 60 + 59 - this.time) < this.accuracyPlus) {
+			int curTimeMinus = this.accuracyMinus;
+			int curTimePlus = this.accuracyPlus;
+			int curTime = this.time;
+			if (this.day < Fleight.daysCount ) {
+				int curDay = this.day;
+				this.setDay(curDay + 1);
+				this.setAccuracyMinus(0);
+				this.setAccuracyPlus(this.accuracyPlus - 1 - ((23 * 60 + 59) - this.time));
+				this.setTime(0);
+				result = this.find();
+				System.out.println(result);
+				this.setDay(curDay);
+			}
+			this.setTime(curTime - curTimeMinus);
+			this.setAccuracyMinus(0);
+			this.setAccuracyPlus(23 * 60 + 59 - this.time);
+			result.addAll(this.find());
+			this.setTime(curTime);
+			this.setAccuracyMinus(curTimeMinus);
+			this.setAccuracyPlus(curTimePlus);
+		}
+		if (this.time >= this.accuracyMinus && (24 * 60 - this.time) > this.accuracyPlus ) {
+			SelectSQLRequest request = new SelectSQLRequest("vk_bot", "flights", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("direction = " + this.direction + " AND day = " + this.day + " AND time > " + (this.time - this.accuracyMinus) + " AND time < " + (this.time + this.accuracyPlus)).addSelectingField("*");
+			RowArray response = request.execute();
+			while (response.next()) {
+				int intTime = Integer.parseInt(response.getString("time"));
+				String minutes = (intTime % 60) < 10 ? "0" + (intTime % 60) : "" + (intTime % 60);
+				String time = Integer.toString(intTime / 60) + ":" + minutes;
+				String userId = response.getString("user_id");
+				String number = response.getString("number");
+				String note = response.getString("note");
+				String name = "Время: " + time + "\nСтраница ВК: https://vk.com/id" + userId + "\nНомер: " + number + "\nЗаметка: " + note;
+				result.add((FleightInfoState) new FleightInfoState().setName(name));
+			}
 		}
 		return result;
 	}
@@ -319,10 +364,12 @@ public class Fleight implements Deletable {
 	}
 	
 	public int getTimeFrom() {
+		System.out.println(this.time - this.accuracyMinus);
 		return this.time - this.accuracyMinus;
 	}
 	
 	public int getTimeTo() {
+		System.out.println(this.time + this.accuracyPlus);
 		return this.time + this.accuracyPlus;
 	}
 	

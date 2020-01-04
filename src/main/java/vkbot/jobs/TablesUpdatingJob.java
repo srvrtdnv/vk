@@ -71,7 +71,6 @@ public class TablesUpdatingJob implements Job {
 		}
 		pCenter.clearAllMaps();
 		pCenter.setIsMaintenance(false);
-		System.out.println("Tables updating complete");
 	}
 
 }
