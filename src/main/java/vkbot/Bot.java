@@ -54,7 +54,9 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 			JobDetail jDetail = JobBuilder.newJob(RandIdTableUpdatingJob.class).setJobData(jDMap).withIdentity("randIdUpdating", "myFristGroup").build();
 			scheduler.start();
 			scheduler.scheduleJob(jDetail, trigger);
+			System.out.println("BOT UPLOADED");
 		} catch (SchedulerException e) {
+			ProcessingCenter.logError(e);
 		}
 	}
 	
@@ -70,13 +72,13 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 		if (message.getPayload() == null) {
 			text = message.getText();
 		} else if (message.getPayload().contains(".")) {
-			text = message.getPayload().replaceAll("\\d\\.", "");
-			System.out.println("REGEX: " + text);
-			text = text.replaceAll("1\\d*", "");
-			System.out.println("REGEX: " + text);
+			//text = message.getPayload().replaceAll("\\d\\.", "");
+			//System.out.println("REGEX: " + text);
+			//text = text.replaceAll("1\\d*", "");
+			//System.out.println("REGEX: " + text);
 			text = message.getPayload().replaceAll("([\\d&&[^0]]\\d*)$", "");
 			text = text.replaceAll("\\d\\.", "");
-			System.out.println("REGEX3: " + text);
+			//System.out.println("REGEX3: " + text);
 		} else {
 			text = message.getPayload();
 		}
@@ -120,7 +122,7 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 			message = vk.messages().getById(groupActor, message.getId()).execute().getItems().get(0);
 			pCenter.startProcessing(this, convertMessageType(message));
 		} catch (Exception e) {
-			System.out.println("a" + e);
+			ProcessingCenter.logError(e);
 		}
 	}
 	
@@ -156,7 +158,7 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 			}
 			reader.close();
 		} catch (Exception e) {
-			
+			ProcessingCenter.logError(e);
 		}
 	}
 	
@@ -273,7 +275,7 @@ public class Bot extends CallbackApiLongPoll implements SimpleMessenger {
 			return 1;
 			*/
 		} catch (Exception e) {
-			System.out.println(e);
+			ProcessingCenter.logError(e);
 		}
 		return -1;
 	}

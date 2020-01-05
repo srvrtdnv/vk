@@ -21,7 +21,7 @@ public class DeleteOptionCommandHandler extends MessageHandler {
 			pCenter.setState(messenger, userId, pCenter.getSavedState(userId));
 			return 1;
 		} catch (Exception e) {
-			
+			ProcessingCenter.logError(e);
 		}
 		return this.getNext().handle(messenger, message, state);
 	}

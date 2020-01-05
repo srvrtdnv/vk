@@ -3,7 +3,7 @@ vkbot\InitializingClass$14.class
 vkbot\handlers\BackCommandHandler.class
 vkbot\handlers\OptionsListCommandHandler.class
 vkbot\state\State.class
-vkbot\sql\AbstractTablesManager.class
+vkbot\jobs\TablesUpdatingJob.class
 vkbot\InitializingClass$4.class
 vkbot\ProcessingCenter.class
 vkbot\state\ErrorState.class
@@ -19,7 +19,6 @@ vkbot\InitializingClass$23.class
 vkbot\handlers\SetAutoPostCommandHandler.class
 vkbot\AutoNotification.class
 vkbot\InitializingClass$7.class
-vkbot\state\MaintenanceState.class
 vkbot\state\NullState.class
 vkbot\InitializingClass$15.class
 vkbot\handlers\TimeCommandHandler$2.class
@@ -31,7 +30,6 @@ vkbot\InitializingClass$11.class
 vkbot\handlers\SelectMenuItemCommandHandler.class
 vkbot\SimpleMessenger.class
 vkbot\InitializingClass$20.class
-vkbot\jobs\DatabasesUpdatingJob.class
 vkbot\InitializingClass$18.class
 vkbot\handlers\DeleteOptionCommandHandler.class
 vkbot\MessageStandardClass.class
@@ -55,11 +53,11 @@ vkbot\AutoPost.class
 vkbot\state\PostConfirmingState.class
 vkbot\InitializingClass$9$1.class
 vkbot\InitializingClass$13.class
-vkbot\sql\ConcretTablesManager.class
 vkbot\sql\RowArray.class
+vkbot\InitializingClass$16$1.class
 vkbot\InitializingClass$2.class
 vkbot\state\FleightInfoState.class
-vkbot\InitializingClass$14$1.class
+vkbot\InitializingClass$25.class
 vkbot\InitializingClass$21.class
 vkbot\InitializingClass$5.class
 vkbot\InitializingClass.class
@@ -70,4 +68,5 @@ vkbot\handlers\FastCreateFleightCommandHandler.class
 vkbot\state\UnknownMessageState.class
 vkbot\InitializingClass$10.class
 vkbot\InitializingClass$8.class
+vkbot\jobs\RandIdTableUpdatingJob.class
 vkbot\handlers\NullHandler.class

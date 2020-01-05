@@ -7,7 +7,6 @@ s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\NullHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\MessageStandardClass.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\SimpleMessenger.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\AutoNotification.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\jobs\DatabasesUpdatingJob.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\InitializingClass.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\UnknownMessageState.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\MainMenuCommandHandler.java
@@ -18,7 +17,7 @@ s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\InsertOnDuplicateKeySQLRequest.j
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\AbstractSQLRequest.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\BackCommandHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\TimeCommandHandler.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\MaintenanceState.java
+s:\WorkSpace\VKBot\bott\src\main\java\vkbot\jobs\RandIdTableUpdatingJob.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\MessageHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\InsertSQLRequest.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\App.java
@@ -32,8 +31,7 @@ s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\OptionsListCommandHandler.j
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\SetAutoNotificationCommandHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\NullState.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\Deletable.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\AbstractTablesManager.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\ConcretTablesManager.java
+s:\WorkSpace\VKBot\bott\src\main\java\vkbot\jobs\TablesUpdatingJob.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\SelectSQLRequest.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\FleightInfoState.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\SetAutoPostCommandHandler.java

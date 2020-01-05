@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import vkbot.ProcessingCenter;
+
 public class UpdateSQLRequest extends AbstractSQLRequest<Integer> {
 	private String whereFields;
 	private Map<String,String> values = new HashMap<String,String>();
@@ -42,6 +44,7 @@ public class UpdateSQLRequest extends AbstractSQLRequest<Integer> {
 			connection.close();
 			return result;
 		} catch (Exception e) {
+			ProcessingCenter.logError(e);
 		}
 		return -1;
 	}

@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import vkbot.ProcessingCenter;
+
 public class InsertOnDuplicateKeySQLRequest extends AbstractSQLRequest<Integer> {
 	private String primColumnName, primValue;
 	private Map<String,String> values = new HashMap<String,String>();
@@ -45,6 +47,7 @@ public class InsertOnDuplicateKeySQLRequest extends AbstractSQLRequest<Integer> 
 			connection.close();
 			return result;
 		} catch (Exception e) {
+			ProcessingCenter.logError(e);
 		}
 		return -1;
 	}

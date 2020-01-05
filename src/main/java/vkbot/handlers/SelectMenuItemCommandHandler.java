@@ -22,7 +22,7 @@ public class SelectMenuItemCommandHandler extends MessageHandler {
 			}
 			else return getNext().handle(messenger, message, state);
 		} catch (Exception e) {
-			
+			ProcessingCenter.logError(e);
 		}
 		return this.getNext().handle(messenger, message, state);
 	}

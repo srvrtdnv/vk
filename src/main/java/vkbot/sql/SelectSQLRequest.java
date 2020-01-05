@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
+import vkbot.ProcessingCenter;
+
 public class SelectSQLRequest extends AbstractSQLRequest<RowArray> {
 	private ArrayList<String> selectingFields = new ArrayList<String>();
 	private String whereFields;
@@ -42,6 +44,7 @@ public class SelectSQLRequest extends AbstractSQLRequest<RowArray> {
 			connection.close();
 			return res;
 		} catch (Exception e) {
+			ProcessingCenter.logError(e);
 		}
 		
 		return null;

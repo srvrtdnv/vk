@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
+import vkbot.ProcessingCenter;
+
 public class DeleteSQLRequest extends AbstractSQLRequest<Integer> {
 	private String whereFields;
 	
@@ -33,6 +35,7 @@ public class DeleteSQLRequest extends AbstractSQLRequest<Integer> {
 			connection.close();
 			return result;
 		} catch(Exception e) {
+			ProcessingCenter.logError(e);
 		}
 		return -1;
 	}

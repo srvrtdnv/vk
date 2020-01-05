@@ -1,7 +1,10 @@
 package vkbot;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,6 +30,27 @@ public class ProcessingCenter {
 		commonHandler.setNext(new MainMenuCommandHandler());
 		commonHandler.setNext(new SelectMenuItemCommandHandler());
 		commonHandler.setNext(new UnknownCommandHandler());
+	}
+	
+	public static void logError(Exception e) {
+		try {
+			FileWriter fWriter= new FileWriter("errors.txt");
+			Date date = new Date();
+			String str = "ERROR [" + date.toString() + "]: " + e.toString();
+			fWriter.write(str);
+			fWriter.close();
+		} catch (IOException e1) {
+		}
+	}
+	
+	public static void logEvent(String str) {
+		try {
+			FileWriter fWriter= new FileWriter("events.txt");
+			Date date = new Date();
+			fWriter.write("[" + date.toString() + "]: " + str);
+			fWriter.close();
+		} catch (IOException e1) {
+		}
 	}
 	
 	public void clearAllMaps() {
@@ -57,13 +81,17 @@ public class ProcessingCenter {
 				stateId = result.next() ? result.getString("state") : "";
 				usersState.put(userId, stateId);
 			}
+			if (stateId.equals("banned")) { 
+				messenger.sendText(new MessageStandardClass("Ты забанен. За подробностями @id84951026(сюда).", userId, "vk", null).setIsKeyboardOn(false).setIsBackButtonOn(false).setIsMainMenuButtonOn(false));
+				return;
+			}
 			if (stateId.equals("saved state")) state = this.savedStates.get(userId);
 			else state = NullState.getState(stateId);
 			MessageHandler handler = state.getHandler();
 			handler.handle(messenger, message, state);
 			this.isHereIncompletedProcess = false;
 		} catch (Exception e) {
-			System.out.println("processing center.startProcessing : " + e + "\n");
+			ProcessingCenter.logError(e);
 		}
 	}
 

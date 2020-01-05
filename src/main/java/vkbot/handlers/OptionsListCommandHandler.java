@@ -106,7 +106,7 @@ public class OptionsListCommandHandler extends MessageHandler{
 						
 						return result;
 					} catch (Exception e) {
-						System.out.println("Конструирование опций: " + e);
+						ProcessingCenter.logError(e);
 					}
 					return "error";
 				}

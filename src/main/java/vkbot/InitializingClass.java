@@ -31,7 +31,7 @@ public class InitializingClass {
 		TransportClient transportClient = HttpTransportClient.getInstance();
 		VkApiClient vk = new VkApiClient(transportClient);
 		ProcessingCenter pCenter = ProcessingCenter.getInstance();
-		pCenter.setPassFileName("S:/WorkSpace/vkbot/bott/sqlpass.txt").setDriver("com.mysql.cj.jdbc.Driver").setUrl("jdbc:mysql://127.0.0.1:3306/");
+		pCenter.setPassFileName("sqlpass.txt").setDriver("com.mysql.cj.jdbc.Driver").setUrl("jdbc:mysql://127.0.0.1:3306/");
 		
 		/*
 		 * инициализация дерева состояний
@@ -45,9 +45,9 @@ public class InitializingClass {
 		
 		/*
 		 * обработчик для диалога ввода направления
+		 * для создания публикации
 		 * (создает объект поездки с нужным направлением)
 		 */
-		
 		
 		MessageHandler directionHandler = new MessageHandler() {
 			@Override
@@ -70,6 +70,12 @@ public class InitializingClass {
 			}
 		};
 		
+		/*
+		 * обработчик для диалога ввода направления
+		 * для поиска публикациии
+		 * (создает объект поездки с нужным направлением)
+		 */
+		
 		MessageHandler directionHandler1 = new MessageHandler() {
 			@Override
 			public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
@@ -85,7 +91,7 @@ public class InitializingClass {
 						return 1;
 					}
 				} catch (Exception e) {
-					
+					ProcessingCenter.logError(e);
 				}
 				return this.getNext().handle(messenger, message, state);
 			}
@@ -93,6 +99,7 @@ public class InitializingClass {
 		
 		/*
 		 * обработчик ввода дня
+		 * для создания публикации
 		 * (берет существующий незаполненный объект поездки и добавляет день)
 		 */
 		MessageHandler dayHandler = new MessageHandler() {
@@ -124,11 +131,17 @@ public class InitializingClass {
 						return 1;
 					}
 				} catch (Exception e) {
-					
+					ProcessingCenter.logError(e);
 				}
 				return this.getNext().handle(messenger, message, state);
 			}
 		};
+		
+		/*
+		 * обработчик ввода дня
+		 * для поиска публикации
+		 * (берет существующий незаполненный объект поездки и добавляет день)
+		 */
 		
 		MessageHandler dayHandler1 = new MessageHandler() {
 			@Override
@@ -152,7 +165,7 @@ public class InitializingClass {
 						return 1;
 					}
 				} catch (Exception e) {
-					
+					ProcessingCenter.logError(e);
 				}
 				return this.getNext().handle(messenger, message, state);
 			}
@@ -388,6 +401,12 @@ public class InitializingClass {
 		};
 		
 		
+		/*
+		 * далее идет само дерево состояний
+		 * точнее
+		 * его основная часть
+		 */
+		
 		NullState nullState = NullState.getInstance();
 		MessageHandler commonHandler = ProcessingCenter.getInstance().getHandler();
 		
@@ -416,7 +435,7 @@ public class InitializingClass {
 					try {
 						return this.getMessage() + Fleight.getDirectionNames();
 					} catch (Exception e) {
-						
+						ProcessingCenter.logError(e);
 					}
 					return "error";
 				}
@@ -649,7 +668,7 @@ public class InitializingClass {
 					try {
 						return this.getMessage() + Fleight.getDirectionNames();
 					} catch (Exception e) {
-						
+						ProcessingCenter.logError(e);
 					}
 					return "error";
 				}
@@ -697,10 +716,15 @@ public class InitializingClass {
 				
 			}).setNextHandler(new MainMenuCommandHandler()).setNextHandler(new UnknownCommandHandler());
 			nullState.addState(state);
+		
+		/*
+		 * создание актора
+		 * триггера для ежедневного обновления таблиц
+		 * и их запуск	
+		 */
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader("S:/WorkSpace/vkbot/bott/conf.txt"));
+			BufferedReader reader = new BufferedReader(new FileReader("conf.txt"));
 			GroupActor actor = new GroupActor(189799593, reader.readLine());
-			System.out.println(ProcessingCenter.getInstance());
 			Bot bot = new Bot(vk, actor);
 			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
 			Trigger dailyTrigger = TriggerBuilder.newTrigger().withIdentity("midnightTrigger", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ? *")).build();
@@ -709,9 +733,10 @@ public class InitializingClass {
 			scheduler.scheduleJob(jDetail, dailyTrigger);
 			reader.close();
 			bot.uploadGroupActors("conf.txt");
+			System.out.println("READY TO START");
 			bot.run();
 		} catch (Exception e) {
-			System.out.println(e);
+			ProcessingCenter.logError(e);
 		} 
 
 	}

@@ -81,6 +81,7 @@ public class TimeCommandHandler extends MessageHandler {
 				break;
 			}
 		} catch (Exception e) {
+			ProcessingCenter.logError(e);
 			return this.getNext().handle(messenger, message, state);
 		}
 		

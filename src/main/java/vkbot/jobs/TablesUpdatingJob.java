@@ -71,6 +71,7 @@ public class TablesUpdatingJob implements Job {
 		}
 		pCenter.clearAllMaps();
 		pCenter.setIsMaintenance(false);
+		ProcessingCenter.logEvent("Tables refreshed.");
 	}
 
 }
