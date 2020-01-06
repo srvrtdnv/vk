@@ -350,7 +350,7 @@ public class InitializingClass {
 				}
 				if (text.replaceAll("[([пП][нНтТ])([вВчЧ][тТ])([сС][рРбБ])([вВ][сС])[\\s]]", "").trim().equals("") ) {
 					Fleight fleight = pCenter.getIncompletedFleight(userId);
-					fleight.setAutoPostDays(text);
+					fleight.setAutoPostDays(text.toLowerCase());
 					
 					StringBuilder result = new StringBuilder("Проверь и потверди.\n");
 					result.append(fleight.getFullInfo());
@@ -461,7 +461,7 @@ public class InitializingClass {
 					state.setName("День");
 					nullState.addState(state);
 					
-						state = new State("1.1.1.1", "Введи номер телефона.", selectSavedNumberCommandHandler.setNext(new BackCommandHandler()).setNext(new MainMenuCommandHandler()).setNext(numbHandler), false);
+						state = new State("1.1.1.1", "Введи номер телефона.\nP.S. бот примет любую команду, поэтому указывай либо существующий номер, либо, если не предусматриваешь связь через телефон, указывай предпочтительный способ связи.", selectSavedNumberCommandHandler.setNext(new BackCommandHandler()).setNext(new MainMenuCommandHandler()).setNext(numbHandler), false);
 						state.setName("Ввести время");
 						nullState.addState(state);
 						
@@ -476,7 +476,7 @@ public class InitializingClass {
 										pCenter.setState(messenger, userId, new State("1.1.1.1", false) {
 											@Override
 											public String buildText() {
-												String text = "Введи номер телефона.";
+												String text = "Введи номер телефона.\nP.S. бот примет любую команду, поэтому указывай либо существующий номер, либо, если не предусматриваешь связь через телефон, указывай предпочтительный способ связи.";
 												SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + userId).addSelectingField("saved_number");
 												RowArray result = request.execute();
 												if (result.next() && (result.getString("saved_number") != null)) {
