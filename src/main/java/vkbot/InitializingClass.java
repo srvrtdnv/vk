@@ -57,9 +57,9 @@ public class InitializingClass {
 				String text = message.getText();
 				try {
 					int direction = Integer.parseInt(text);
-					if (direction <= Fleight.getDirectionsCount() && direction > 0) {
-						Fleight fleight = new Fleight().setDirection(direction).setUserId(userId);
-						pCenter.addIncompletedFleight(userId, fleight);
+					if (direction <= Flight.getDirectionsCount() && direction > 0) {
+						Flight flight = new Flight().setDirection(direction).setUserId(userId);
+						pCenter.addIncompletedFlight(userId, flight);
 						pCenter.setState(messenger, userId, state.get(1));
 						return 1;
 					}
@@ -84,9 +84,9 @@ public class InitializingClass {
 				String text = message.getText();
 				try {
 					int direction = Integer.parseInt(text);
-					if (direction <= Fleight.getDirectionsCount() && direction > 0) {
-						Fleight fleight = new Fleight().setDirection(Integer.parseInt(text)).setUserId(userId);
-						pCenter.addIncompletedFleight(userId, fleight);
+					if (direction <= Flight.getDirectionsCount() && direction > 0) {
+						Flight flight = new Flight().setDirection(Integer.parseInt(text)).setUserId(userId);
+						pCenter.addIncompletedFlight(userId, flight);
 						pCenter.setState(messenger, userId, state.get(1));
 						return 1;
 					}
@@ -108,7 +108,7 @@ public class InitializingClass {
 				ProcessingCenter pCenter = ProcessingCenter.getInstance();
 				String userId = message.getUserId();
 				
-				if (!pCenter.isContainsFleight(userId)) {
+				if (!pCenter.isContainsFlight(userId)) {
 					State errState = new ErrorState();
 					errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.");
 					pCenter.setState(messenger, userId, errState);
@@ -117,10 +117,10 @@ public class InitializingClass {
 				
 				try {
 					Integer day = Integer.parseInt(message.getText());
-					if (day <= Fleight.getDaysCount() && day > 0) {
-						Fleight fleight = pCenter.getIncompletedFleight(userId);
-						fleight.setDay(day);
-						if (fleight.isExist()) {
+					if (day <= Flight.getDaysCount() && day > 0) {
+						Flight flight = pCenter.getIncompletedFlight(userId);
+						flight.setDay(day);
+						if (flight.isExist()) {
 							State err = new ErrorState().setMessage("На этот день в данном направлении у тебя уже есть поездка.").setIsBackButtonOn(false);
 							err.get(0).setFullId("saved state");
 							pCenter.setSavedState(userId, err);
@@ -149,7 +149,7 @@ public class InitializingClass {
 				ProcessingCenter pCenter = ProcessingCenter.getInstance();
 				String userId = message.getUserId();
 				
-				if (!pCenter.isContainsFleight(userId)) {
+				if (!pCenter.isContainsFlight(userId)) {
 					State errState = new ErrorState();
 					errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.");
 					pCenter.setState(messenger, userId, errState);
@@ -158,9 +158,9 @@ public class InitializingClass {
 				
 				try {
 					Integer day = Integer.parseInt(message.getText());
-					if (day <= Fleight.getDaysCount() && day > 0) {
-						Fleight fleight = pCenter.getIncompletedFleight(userId);
-						fleight.setDay(day);
+					if (day <= Flight.getDaysCount() && day > 0) {
+						Flight flight = pCenter.getIncompletedFlight(userId);
+						flight.setDay(day);
 						pCenter.setState(messenger, message.getUserId(), state.get(1));
 						return 1;
 					}
@@ -180,15 +180,15 @@ public class InitializingClass {
 				final ProcessingCenter pCenter = ProcessingCenter.getInstance();
 				final String userId = message.getUserId();
 				
-				if (!pCenter.isContainsFleight(userId)) {
+				if (!pCenter.isContainsFlight(userId)) {
 					State errState = new ErrorState();
 					errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.");
 					pCenter.setState(messenger, userId, errState);
 					return -1;
 				}
 				
-				Fleight fleight = pCenter.getIncompletedFleight(userId);
-				fleight.setNumber(message.getText());
+				Flight flight = pCenter.getIncompletedFlight(userId);
+				flight.setNumber(message.getText());
 				pCenter.setState(messenger, userId, new State("1.1.1.1.1", false) {
 					@Override
 					public String buildText() {
@@ -235,15 +235,15 @@ public class InitializingClass {
 				ProcessingCenter pCenter = ProcessingCenter.getInstance();
 				String userId = message.getUserId();
 				
-				if (!pCenter.isContainsFleight(userId)) {
+				if (!pCenter.isContainsFlight(userId)) {
 					State errState = new ErrorState();
 					errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.");
 					pCenter.setState(messenger, userId, errState);
 					return -1;
 				}
 				
-				Fleight fleight = pCenter.getIncompletedFleight(userId);
-				fleight.setNote(message.getText());
+				Flight flight = pCenter.getIncompletedFlight(userId);
+				flight.setNote(message.getText());
 				pCenter.setState(messenger, userId, state.get(1));
 				return 1;
 			}
@@ -282,9 +282,9 @@ public class InitializingClass {
 			public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
 				ProcessingCenter pCenter = ProcessingCenter.getInstance();
 				String userId = message.getUserId();
-				Fleight fleight = pCenter.getIncompletedFleight(userId);
+				Flight flight = pCenter.getIncompletedFlight(userId);
 				
-				if (!pCenter.isContainsFleight(userId)) {
+				if (!pCenter.isContainsFlight(userId)) {
 					State errState = new ErrorState();
 					errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.");
 					pCenter.setState(messenger, userId, errState);
@@ -292,10 +292,10 @@ public class InitializingClass {
 				}
 				
 				if (message.getText().equals("1")) {
-					fleight.setAutoPostOn(true);
-					if (fleight.isAutoPostExist()) {
+					flight.setAutoPostOn(true);
+					if (flight.isAutoPostExist()) {
 						State err = new ErrorState().setMessage("Автопубликация в этом направлении уже активирована.").setPrevState(state).setNextHandler(new BackCommandHandler());
-						fleight.setAutoPostOn(false);
+						flight.setAutoPostOn(false);
 						pCenter.setSavedState(userId, err);
 						pCenter.setState(messenger, userId, err);
 						return -1;
@@ -305,7 +305,7 @@ public class InitializingClass {
 				} else if (message.getText().equals("2")) {
 					
 					StringBuilder result = new StringBuilder("Проверь и потверди.\n");
-					result.append(fleight.getFullInfo());
+					result.append(flight.getFullInfo());
 					result.append("\n1 - Подтвердить");
 					
 					State postConfirmingState = new State("1.1.1.1.1.1.2", false) {
@@ -342,18 +342,18 @@ public class InitializingClass {
 				String userId = message.getUserId();
 				ProcessingCenter pCenter = ProcessingCenter.getInstance();
 				
-				if (!pCenter.isContainsFleight(userId)) {
+				if (!pCenter.isContainsFlight(userId)) {
 					State errState = new ErrorState();
 					errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.");
 					pCenter.setState(messenger, userId, errState);
 					return -1;
 				}
 				if (text.replaceAll("[([пП][нНтТ])([вВчЧ][тТ])([сС][рРбБ])([вВ][сС])[\\s]]", "").trim().equals("") ) {
-					Fleight fleight = pCenter.getIncompletedFleight(userId);
-					fleight.setAutoPostDays(text.toLowerCase());
+					Flight flight = pCenter.getIncompletedFlight(userId);
+					flight.setAutoPostDays(text.toLowerCase());
 					
 					StringBuilder result = new StringBuilder("Проверь и потверди.\n");
-					result.append(fleight.getFullInfo());
+					result.append(flight.getFullInfo());
 					result.append("\n1 - Подтвердить");
 					
 					State postConfirmingState = new State("1.1.1.1.1.1.1.1.1", false) {
@@ -384,14 +384,14 @@ public class InitializingClass {
 					String userId = message.getUserId();
 					ProcessingCenter pCenter = ProcessingCenter.getInstance();
 					
-					if (!pCenter.isContainsFleight(userId)) {
+					if (!pCenter.isContainsFlight(userId)) {
 						State errState = new ErrorState();
 						errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.");
 						pCenter.setState(messenger, userId, errState);
 						return -1;
 					}
 					
-					pCenter.getIncompletedFleight(userId).post(messenger);
+					pCenter.getIncompletedFlight(userId).post(messenger);
 					pCenter.setState(messenger, userId, state.get(1));
 					return 1;
 				}
@@ -410,7 +410,7 @@ public class InitializingClass {
 		NullState nullState = NullState.getInstance();
 		MessageHandler commonHandler = ProcessingCenter.getInstance().getHandler();
 		
-		State mainMenu = new State("", "Главное меню. Выбери нужное, отправив соответствующее сообщение:", new OptionsListCommandHandler().setNext(new SelectMenuItemCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new FastCreateFleightCommandHandler()).setNext(new FastFleightFindCommandHandler()), true);
+		State mainMenu = new State("", "Главное меню. Выбери нужное, отправив соответствующее сообщение:", new OptionsListCommandHandler().setNext(new SelectMenuItemCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new FastCreateFlightCommandHandler()).setNext(new FastFlightFindCommandHandler()), true);
 		mainMenu.setName("Главное меню").setIsMainMenuButtonOn(false).setIsBackButtonOn(false);
 		mainMenu.setNextHandler(new MessageHandler() {
 
@@ -433,7 +433,7 @@ public class InitializingClass {
 				@Override
 				public String buildText() {
 					try {
-						return this.getMessage() + Fleight.getDirectionNames();
+						return this.getMessage() + Flight.getDirectionNames();
 					} catch (Exception e) {
 						ProcessingCenter.logError(e);
 					}
@@ -451,7 +451,7 @@ public class InitializingClass {
 				state = new State("1.1", "Выбери день, в который поедешь.", dayHandler.setNext(commonHandler), false) {
 					@Override
 					public String buildText() {
-						return this.getMessage() + Fleight.getDayNames();
+						return this.getMessage() + Flight.getDayNames();
 					}
 				};
 				state.setName("Направление");
@@ -546,21 +546,21 @@ public class InitializingClass {
 											ProcessingCenter pCenter = ProcessingCenter.getInstance();
 											String userId = message.getUserId();
 											
-											if (!pCenter.isContainsFleight(userId)) {
+											if (!pCenter.isContainsFlight(userId)) {
 												State errState = new ErrorState();
 												errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.").setIsBackButtonOn(false);
 												pCenter.setState(messenger, userId, errState);
 												return -1;
 											}
 											
-											Fleight fleight = pCenter.getIncompletedFleight(userId);
+											Flight flight = pCenter.getIncompletedFlight(userId);
 											
 											if (message.getText().equals("1")) {
-												fleight.setFrequency(false);
+												flight.setFrequency(false);
 												pCenter.setState(messenger, userId, state.get(1));
 												return 1;
 											} else if (message.getText().equals("2")) {
-												fleight.setFrequency(true);
+												flight.setFrequency(true);
 												pCenter.setState(messenger, userId, state.get(1));
 												return 1;
 											}
@@ -666,7 +666,7 @@ public class InitializingClass {
 				@Override
 				public String buildText() {
 					try {
-						return this.getMessage() + Fleight.getDirectionNames();
+						return this.getMessage() + Flight.getDirectionNames();
 					} catch (Exception e) {
 						ProcessingCenter.logError(e);
 					}
@@ -680,7 +680,7 @@ public class InitializingClass {
 				state = new State("2.1", "Выбери день, в который хочешь поехать.", dayHandler1.setNext(commonHandler), false) {
 					@Override
 					public String buildText() {
-						return this.getMessage() + Fleight.getDayNames();
+						return this.getMessage() + Flight.getDayNames();
 					}
 				};
 				state.setName("Направление");

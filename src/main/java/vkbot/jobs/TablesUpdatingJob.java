@@ -6,7 +6,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import vkbot.Fleight;
+import vkbot.Flight;
 import vkbot.ProcessingCenter;
 import vkbot.sql.DeleteSQLRequest;
 import vkbot.sql.RowArray;
@@ -65,7 +65,7 @@ public class TablesUpdatingJob implements Job {
 		while (response.next()) {
 			String days = response.getString("days").toLowerCase();
 			if (days.contains(nextDay)) {
-				Fleight flight = new Fleight().setDirection(response.getInt("direction")).setDay(2).setTime(response.getInt("time")).setUserId(response.getString("user_id")).setNumber(response.getString("number")).setNote(response.getString("note"));
+				Flight flight = new Flight().setDirection(response.getInt("direction")).setDay(2).setTime(response.getInt("time")).setUserId(response.getString("user_id")).setNumber(response.getString("number")).setNote(response.getString("note"));
 				flight.post();
 			}
 		}

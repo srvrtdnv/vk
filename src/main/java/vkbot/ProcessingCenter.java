@@ -20,7 +20,7 @@ public class ProcessingCenter {
 	private HashMap<String, String> usersState = new HashMap<String, String>();
 	private MessageHandler commonHandler;
 	private String passFileName, url, driver;
-	private HashMap<String, Fleight> incompletedFlights = new HashMap<String, Fleight>();
+	private HashMap<String, Flight> incompletedFlights = new HashMap<String, Flight>();
 	private HashMap<String, State> savedLists = new HashMap<String, State>();
 	private HashMap<String, List<Deletable>> options = new HashMap<String, List<Deletable>>();
 	private HashMap<String, State> savedStates = new HashMap<String, State>();
@@ -95,8 +95,8 @@ public class ProcessingCenter {
 		}
 	}
 
-	public void addIncompletedFleight(String userId, Fleight fleight) {
-		this.incompletedFlights.put(userId, fleight);
+	public void addIncompletedFlight(String userId, Flight Flight) {
+		this.incompletedFlights.put(userId, Flight);
 	}
 	
 	public void addOption(String userId, Deletable option) {
@@ -196,7 +196,7 @@ public class ProcessingCenter {
 		return this.isHereIncompletedProcess;
 	}
 	
-	public boolean isContainsFleight(String userId) {
+	public boolean isContainsFlight(String userId) {
 		return this.incompletedFlights.containsKey(userId);
 	}
 	
@@ -231,7 +231,7 @@ public class ProcessingCenter {
 	}
 
 
-	public Fleight getIncompletedFleight(String userId) {
+	public Flight getIncompletedFlight(String userId) {
 		return incompletedFlights.get(userId);
 	}
 

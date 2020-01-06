@@ -1,7 +1,7 @@
 package vkbot.handlers;
 
 import vkbot.AutoNotification;
-import vkbot.Fleight;
+import vkbot.Flight;
 import vkbot.MessageStandardClass;
 import vkbot.ProcessingCenter;
 import vkbot.SimpleMessenger;
@@ -101,7 +101,7 @@ public class SetAutoNotificationCommandHandler extends MessageHandler {
 			 */
 			if (timeTo > 1439) {
 				int count = 0;
-				if (day < Fleight.getDaysCount()) {
+				if (day < Flight.getDaysCount()) {
 					AutoNotification autoN = new AutoNotification().setDay("" + (day + 1)).setDirection("" + direction).setTimeFrom("" + 0).setTimeTo("" + (timeTo % 1440)).setUserId(userId);
 					SelectSQLRequest request = new SelectSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).addSelectingField("*").setWhereFields(" user_id = \"" + userId + "\" AND direction = " + direction + " AND day = " + (day + 1) + " AND time_from < " + (timeTo % 1440));
 					if (!request.execute().next()) {

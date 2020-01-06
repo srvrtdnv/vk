@@ -3,7 +3,7 @@ package vkbot.handlers;
 
 import vkbot.AutoNotification;
 import vkbot.AutoPost;
-import vkbot.Fleight;
+import vkbot.Flight;
 import vkbot.MessageStandardClass;
 import vkbot.ProcessingCenter;
 import vkbot.SimpleMessenger;
@@ -41,9 +41,9 @@ public class OptionsListCommandHandler extends MessageHandler{
 							int direction = rs.getInt("direction");
 							int day = rs.getInt("day");
 							sb1.append("Направление: ");
-							sb1.append(Fleight.getDirectionString(direction));
+							sb1.append(Flight.getDirectionString(direction));
 							sb1.append("\nДень: ");
-							sb1.append(Fleight.getDayString(day));
+							sb1.append(Flight.getDayString(day));
 							sb1.append("\nВремя: ");
 							Integer tFrom = rs.getInt("time_from");
 							Integer tFromMinutes = tFrom % 60;
@@ -60,7 +60,7 @@ public class OptionsListCommandHandler extends MessageHandler{
 						while (rs.next()) {
 							int direction = rs.getInt("direction");
 							sb2.append("Направление: ");
-							sb2.append(Fleight.getDirectionString(direction));
+							sb2.append(Flight.getDirectionString(direction));
 							sb2.append("\nВремя: ");
 							Integer time = rs.getInt("time");
 							Integer minutes = time % 60;
@@ -79,18 +79,18 @@ public class OptionsListCommandHandler extends MessageHandler{
 						while (rs.next()) {
 							int direction = rs.getInt("direction");
 							int day = rs.getInt("day");
-							sb3.append("Направление: " + Fleight.getDirectionString(direction));
+							sb3.append("Направление: " + Flight.getDirectionString(direction));
 							sb3.append("\nВремя: ");
 							Integer time = rs.getInt("time");
 							Integer minutes = time % 60;
 							sb3.append(time / 60 + ":" + (minutes < 10 ? "0" + minutes : minutes));
-							sb3.append("\nДень: " + Fleight.getDayString(day));
+							sb3.append("\nДень: " + Flight.getDayString(day));
 							sb3.append("\nНомер: ");
 							sb3.append(rs.getString("number"));
 							sb3.append("\nЗаметка: ");
 							sb3.append(rs.getString("note"));
 							sb3.append("\n\nОтправь " + index++ + ", чтобы удалить.\n\n");
-							pCenter.addOption(userId, new Fleight().setDay(day).setDirection(direction).setId(rs.getInt("id")));
+							pCenter.addOption(userId, new Flight().setDay(day).setDirection(direction).setId(rs.getInt("id")));
 						}
 						
 						String result = "";

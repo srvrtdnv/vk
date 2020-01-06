@@ -3,13 +3,13 @@ package vkbot.handlers;
 
 import java.util.List;
 
-import vkbot.Fleight;
+import vkbot.Flight;
 import vkbot.MessageStandardClass;
 import vkbot.ProcessingCenter;
 import vkbot.SimpleMessenger;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
-import vkbot.state.FleightInfoState;
+import vkbot.state.FlightInfoState;
 import vkbot.state.State;
 
 /*
@@ -56,10 +56,10 @@ public class TimeCommandHandler extends MessageHandler {
 				return this.getNext().handle(messenger, message, state);
 			}
 			int time = hours * 60 + minutes;
-			Fleight fleight;
+			Flight fleight;
 			switch (state.getFullId())  {
 			case "1.1.1":
-				fleight = pCenter.getIncompletedFleight(userId).setTime(time);
+				fleight = pCenter.getIncompletedFlight(userId).setTime(time);
 				pCenter.setState(messenger, userId, new State("1.1.1.1", false) {
 					@Override
 					public String buildText() {
@@ -75,7 +75,7 @@ public class TimeCommandHandler extends MessageHandler {
 				});
 				break;
 			case "2.1.1":
-				fleight = pCenter.getIncompletedFleight(userId).setTime(time).setAccuracyMinus(accuracyMinus).setAccuracyPlus(accuracyPlus);
+				fleight = pCenter.getIncompletedFlight(userId).setTime(time).setAccuracyMinus(accuracyMinus).setAccuracyPlus(accuracyPlus);
 				newState = buildResultState(fleight).setPrevState(state);
 				pCenter.setSavedState(userId, newState).setState(messenger, userId, newState);
 				break;
@@ -88,8 +88,8 @@ public class TimeCommandHandler extends MessageHandler {
 		return 1;
 	}
 	
-	public State buildResultState(Fleight fleight) {
-		List<FleightInfoState> flightsList = fleight.find();
+	public State buildResultState(Flight fleight) {
+		List<FlightInfoState> flightsList = fleight.find();
 		State resultState = new State("saved state", false) {
 			@Override
 			public String buildText() {
@@ -110,7 +110,7 @@ public class TimeCommandHandler extends MessageHandler {
 		resultState.setHandler(new BackCommandHandler().setNext(new UnknownCommandHandler()).setNext(new MainMenuCommandHandler()).setNext(new SetAutoNotificationCommandHandler()));
 		resultState.get(0).setFullId("saved state");
 		
-		for (FleightInfoState fis : flightsList) {
+		for (FlightInfoState fis : flightsList) {
 			resultState.addState(fis);
 		}
 		if (resultState.getStatesArraySize() == 1) {
