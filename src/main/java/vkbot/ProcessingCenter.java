@@ -34,9 +34,9 @@ public class ProcessingCenter {
 	
 	public static void logError(Exception e) {
 		try {
-			FileWriter fWriter= new FileWriter("errors.txt");
+			FileWriter fWriter= new FileWriter("errors.txt", true);
 			Date date = new Date();
-			String str = "ERROR [" + date.toString() + "]: " + e.toString();
+			String str = "ERROR [" + date.toString() + "]: " + e.toString() + "\n";
 			fWriter.write(str);
 			fWriter.close();
 		} catch (IOException e1) {
@@ -45,9 +45,9 @@ public class ProcessingCenter {
 	
 	public static void logEvent(String str) {
 		try {
-			FileWriter fWriter= new FileWriter("events.txt");
+			FileWriter fWriter= new FileWriter("events.txt", true);
 			Date date = new Date();
-			fWriter.write("[" + date.toString() + "]: " + str);
+			fWriter.write("[" + date.toString() + "]: " + str + "\n");
 			fWriter.close();
 		} catch (IOException e1) {
 		}

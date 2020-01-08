@@ -1,6 +1,5 @@
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\Fleight.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\DeleteOptionCommandHandler.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\FastFleightFindCommandHandler.java
+s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\FastFlightFindCommandHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\UnknownCommandHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\DeleteSQLRequest.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\NullHandler.java
@@ -10,6 +9,7 @@ s:\WorkSpace\VKBot\bott\src\main\java\vkbot\AutoNotification.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\InitializingClass.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\UnknownMessageState.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\MainMenuCommandHandler.java
+s:\WorkSpace\VKBot\bott\src\main\java\vkbot\Flight.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\UpdateSQLRequest.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\SelectMenuItemCommandHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\RowArray.java
@@ -20,10 +20,10 @@ s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\TimeCommandHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\jobs\RandIdTableUpdatingJob.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\MessageHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\InsertSQLRequest.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\App.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\FastCreateFleightCommandHandler.java
+s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\FastCreateFlightCommandHandler.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\State.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\Bot.java
+s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\FlightInfoState.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\ErrorState.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\AutoPost.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\ProcessingCenter.java
@@ -33,6 +33,4 @@ s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\NullState.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\Deletable.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\jobs\TablesUpdatingJob.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\sql\SelectSQLRequest.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\FleightInfoState.java
 s:\WorkSpace\VKBot\bott\src\main\java\vkbot\handlers\SetAutoPostCommandHandler.java
-s:\WorkSpace\VKBot\bott\src\main\java\vkbot\state\PostConfirmingState.java

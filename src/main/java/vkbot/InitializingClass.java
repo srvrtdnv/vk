@@ -14,6 +14,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
+import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.*;
 
 import vkbot.handlers.*;
@@ -734,11 +736,20 @@ public class InitializingClass {
 			reader.close();
 			bot.uploadGroupActors("conf.txt");
 			System.out.println("READY TO START");
-			bot.run();
+			while (true) {
+				try {
+					bot.run();
+				} catch (ApiException e) {
+					ProcessingCenter.logError(e);
+				} catch (ClientException e) {
+					ProcessingCenter.logError(e);
+				}
+				Thread.sleep(5000);
+				ProcessingCenter.logEvent("RECONNECTION");
+			}
 		} catch (Exception e) {
 			ProcessingCenter.logError(e);
 		} 
-
 	}
 
 }
