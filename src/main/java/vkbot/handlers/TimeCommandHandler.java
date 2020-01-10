@@ -28,8 +28,9 @@ public class TimeCommandHandler extends MessageHandler {
 			final String userId = message.getUserId();
 			String text = message.getText().replaceAll("\\s+", " ");
 			String[] array = text.split(" ");
-			int hours = Integer.parseInt(array[0].split(":")[0]);
-			int minutes = Integer.parseInt(array[0].split(":")[1]);
+			if (array[0].split("[.:]").length > 2) this.getNext().handle(messenger, message, state);
+			int hours = Integer.parseInt(array[0].split("[.:]")[0]);
+			int minutes = Integer.parseInt(array[0].split("[.:]")[1]);
 			int accuracyPlus = 30;
 			int accuracyMinus = 30;
 			

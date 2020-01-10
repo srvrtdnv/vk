@@ -727,6 +727,7 @@ public class InitializingClass {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader("conf.txt"));
 			GroupActor actor = new GroupActor(189799593, reader.readLine());
+			//189799593
 			Bot bot = new Bot(vk, actor);
 			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
 			Trigger dailyTrigger = TriggerBuilder.newTrigger().withIdentity("midnightTrigger", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ? *")).build();
