@@ -2,7 +2,7 @@ package vkbot.state;
 
 import java.util.ArrayList;
 
-import vkbot.handlers.MessageHandler;
+import vkbot.handler.MessageHandler;
 
 public class State {
 	private boolean isMenuItem, isKeyboardOn = true, isMainMenuButtonOn = true, isBackButtonOn = true;
@@ -44,7 +44,7 @@ public class State {
 		else if (!(this instanceof NullState)) addState(new UnknownMessageState(fullId + ".0", null));
 	}
 	
-	public String buildText() {
+	public String buildText(String userId) {
 		StringBuilder sb = new StringBuilder(message);
 		int itemNumber = 1;
 		for (int i = 1; i < this.getStatesArraySize(); i++) {

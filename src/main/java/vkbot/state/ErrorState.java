@@ -1,6 +1,6 @@
 package vkbot.state;
 
-import vkbot.handlers.*;
+import vkbot.handler.*;
 
 public class ErrorState extends State {
 
@@ -10,7 +10,7 @@ public class ErrorState extends State {
 	}
 	
 	@Override
-	public String buildText() {
+	public String buildText(String userId) {
 		return this.getMessage();
 	}
 }

@@ -30,6 +30,7 @@ vkbot\InitializingClass$11.class
 vkbot\handlers\SelectMenuItemCommandHandler.class
 vkbot\SimpleMessenger.class
 vkbot\InitializingClass$20.class
+vkbot\InitializingClass$26.class
 vkbot\Flight.class
 vkbot\InitializingClass$18.class
 vkbot\handlers\DeleteOptionCommandHandler.class

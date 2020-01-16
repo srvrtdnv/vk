@@ -6,8 +6,6 @@ import java.io.FileReader;
 import com.vk.api.sdk.callback.longpoll.CallbackApiLongPoll;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
-import com.vk.api.sdk.exceptions.ApiException;
-import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.messages.Keyboard;
 import com.vk.api.sdk.objects.messages.KeyboardButton;
 import com.vk.api.sdk.objects.messages.KeyboardButtonAction;
@@ -17,8 +15,7 @@ import com.vk.api.sdk.objects.messages.Message;
 import com.vk.api.sdk.objects.messages.MessageAttachment;
 import com.vk.api.sdk.queries.messages.MessagesSendQuery;
 
-import vkbot.jobs.RandIdTableUpdatingJob;
-import vkbot.sql.InsertOnDuplicateKeySQLRequest;
+import vkbot.job.RandIdTableUpdatingJob;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 

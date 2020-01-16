@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import vkbot.handlers.*;
+import vkbot.handler.*;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 import vkbot.state.NullState;
@@ -106,7 +106,7 @@ public class ProcessingCenter {
 	
 	public void setState(SimpleMessenger messenger, String userId, State state) {
 		String fullId = state.getFullId();
-		String text = state.buildText();
+		String text = state.buildText(userId);
 		if (fullId.equals("saved state")) this.savedStates.put(userId, state);
 		if (state.isBackButtonOn()) {
 			text += "\n0 - Назад";
@@ -126,7 +126,7 @@ public class ProcessingCenter {
 		State prevState;
 		State newState;
 		String prevStateId = "";
-		String text = state.buildText();
+		String text = state.buildText(userIds.get(0));
 		for (String userId : userIds) {
 			if (usersState.containsKey(userId)) {
 				prevStateId = usersState.get(userId);

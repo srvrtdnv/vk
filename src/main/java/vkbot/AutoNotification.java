@@ -6,7 +6,7 @@ import vkbot.sql.SelectSQLRequest;
 
 public class AutoNotification implements Deletable {
 	
-	private String id, timeFrom, timeTo, direction, day, userId;
+	private String id, timeFrom, timeTo, direction, day, userId, time;
 	
 	@Override
 	public int deleteFromTable() {

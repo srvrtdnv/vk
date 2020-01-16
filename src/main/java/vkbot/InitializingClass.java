@@ -18,8 +18,8 @@ import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.*;
 
-import vkbot.handlers.*;
-import vkbot.jobs.TablesUpdatingJob;
+import vkbot.handler.*;
+import vkbot.job.TablesUpdatingJob;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 import vkbot.state.ErrorState;
@@ -191,9 +191,11 @@ public class InitializingClass {
 				
 				Flight flight = pCenter.getIncompletedFlight(userId);
 				flight.setNumber(message.getText());
+				pCenter.setState(messenger, userId, state.get(1));
+				/*
 				pCenter.setState(messenger, userId, new State("1.1.1.1.1", false) {
 					@Override
-					public String buildText() {
+					public String buildText(String userId) {
 						String text = "Введи заметку (для удобства можно написать откуда выезжаешь и как едешь).";
 						SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + userId).addSelectingField("saved_note");
 						RowArray result = request.execute();
@@ -204,6 +206,7 @@ public class InitializingClass {
 						return text;
 					}
 				});
+				*/
 				return 1;
 			}
 		};
@@ -305,23 +308,7 @@ public class InitializingClass {
 					pCenter.setState(messenger, userId, state.get(1));
 					return 1;
 				} else if (message.getText().equals("2")) {
-					
-					StringBuilder result = new StringBuilder("Проверь и потверди.\n");
-					result.append(flight.getFullInfo());
-					result.append("\n1 - Подтвердить");
-					
-					State postConfirmingState = new State("1.1.1.1.1.1.2", false) {
-						
-						@Override
-						public String buildText() {
-							return this.getMessage();
-						}
-						
-					};
-					
-					postConfirmingState.setMessage(result.toString());
-					pCenter.setSavedState(userId, postConfirmingState);
-					pCenter.setState(messenger, userId, postConfirmingState);
+					pCenter.setState(messenger, userId, state.get(2));
 					return 1;
 				}
 				
@@ -351,23 +338,21 @@ public class InitializingClass {
 					return -1;
 				}
 				if (text.replaceAll("[([пП][нНтТ])([вВчЧ][тТ])([сС][рРбБ])([вВ][сС])[\\s]]", "").trim().equals("") ) {
-					Flight flight = pCenter.getIncompletedFlight(userId);
+					final Flight flight = pCenter.getIncompletedFlight(userId);
 					flight.setAutoPostDays(text.toLowerCase());
-					
-					StringBuilder result = new StringBuilder("Проверь и потверди.\n");
-					result.append(flight.getFullInfo());
-					result.append("\n1 - Подтвердить");
 					
 					State postConfirmingState = new State("1.1.1.1.1.1.1.1.1", false) {
 						@Override
-						public String buildText() {
-							return this.getMessage();
+						public String buildText(String userId) {
+							StringBuilder result = new StringBuilder("Проверь и потверди.\n");
+							result.append(flight.getFullInfo());
+							result.append("\n1 - Подтвердить");
+							return result.toString();
 						}
 					};
 					
-					postConfirmingState.setMessage(result.toString());
 					pCenter.setSavedState(userId, postConfirmingState);
-					pCenter.setState(messenger, userId, postConfirmingState);
+					pCenter.setState(messenger, userId, state.get(1));
 					return 1;
 				}
 				return this.getNext().handle(messenger, message, state);
@@ -393,8 +378,13 @@ public class InitializingClass {
 						return -1;
 					}
 					
-					pCenter.getIncompletedFlight(userId).post(messenger);
-					pCenter.setState(messenger, userId, state.get(1));
+					int result = pCenter.getIncompletedFlight(userId).post(messenger);
+					if (result < 1) {
+						messenger.sendText(new MessageStandardClass("Ошибка на сервере. Запись опубликована некорректно. Проверь наличие в опубликованных поездках.", userId, null, null));
+					} else {
+						messenger.sendText(new MessageStandardClass("Запись добавлена&#9989;\nP.S. помни - водитель в ответе за тех, кого сажает в машину. Пристегивайтесь ремнями безопасности.", userId, null, null));
+					}
+					pCenter.setState(messenger, userId, NullState.getState(""));
 					return 1;
 				}
 				return this.getNext().handle(messenger, message, state);
@@ -412,7 +402,7 @@ public class InitializingClass {
 		NullState nullState = NullState.getInstance();
 		MessageHandler commonHandler = ProcessingCenter.getInstance().getHandler();
 		
-		State mainMenu = new State("", "Главное меню. Выбери нужное, отправив соответствующее сообщение:", new OptionsListCommandHandler().setNext(new SelectMenuItemCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new FastCreateFlightCommandHandler()).setNext(new FastFlightFindCommandHandler()), true);
+		State mainMenu = new State("", "Главное меню. Выбери нужное, отправив соответствующее сообщение:", new SelectMenuItemCommandHandler().setNext(new UnknownCommandHandler()).setNext(new FastCreateFlightCommandHandler()).setNext(new FastFlightFindCommandHandler()), true);
 		mainMenu.setName("Главное меню").setIsMainMenuButtonOn(false).setIsBackButtonOn(false);
 		mainMenu.setNextHandler(new MessageHandler() {
 
@@ -433,7 +423,7 @@ public class InitializingClass {
 			State state = new State("1", "Выбери направление, по которому едешь.", directionHandler.setNext(commonHandler), true) {
 				
 				@Override
-				public String buildText() {
+				public String buildText(String userId) {
 					try {
 						return this.getMessage() + Flight.getDirectionNames();
 					} catch (Exception e) {
@@ -452,7 +442,7 @@ public class InitializingClass {
 				 */
 				state = new State("1.1", "Выбери день, в который поедешь.", dayHandler.setNext(commonHandler), false) {
 					@Override
-					public String buildText() {
+					public String buildText(String userId) {
 						return this.getMessage() + Flight.getDayNames();
 					}
 				};
@@ -463,12 +453,40 @@ public class InitializingClass {
 					state.setName("День");
 					nullState.addState(state);
 					
-						state = new State("1.1.1.1", "Введи номер телефона.\nP.S. бот примет любую команду, поэтому указывай либо существующий номер, либо, если не предусматриваешь связь через телефон, указывай предпочтительный способ связи.", selectSavedNumberCommandHandler.setNext(new BackCommandHandler()).setNext(new MainMenuCommandHandler()).setNext(numbHandler), false);
+						state = new State("1.1.1.1", "Введи номер телефона.\nP.S. бот примет любую команду, поэтому указывай либо существующий номер, либо, если не предусматриваешь связь через телефон, указывай предпочтительный способ связи.", selectSavedNumberCommandHandler.setNext(new BackCommandHandler()).setNext(new MainMenuCommandHandler()).setNext(numbHandler), false) {
+							@Override
+							public String buildText(String userId) {
+								ProcessingCenter pCenter = ProcessingCenter.getInstance();
+								String text = "Введи номер телефона.\nP.S. бот примет любую команду, поэтому указывай либо существующий номер, либо, если не предусматриваешь связь через телефон, указывай предпочтительный способ связи.";
+								SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + userId).addSelectingField("saved_number");
+								RowArray result = request.execute();
+								if (result.next() && (result.getString("saved_number") != null)) {
+									String number = result.getString("saved_number");
+									text += "\nРанее использованный номер: " + number+ "\n1 - Использовать сохраненный номер";
+								}
+								return text;
+							}
+						};
 						state.setName("Ввести время");
 						nullState.addState(state);
 						
-							state = new State("1.1.1.1.1", "Введи заметку (для удобства можно написать откуда выезжаешь и как едешь).", selectSavedNoteCommandHandler.setNext(new MainMenuCommandHandler()), false);
+							state = new State("1.1.1.1.1", "Введи заметку (для удобства можно написать откуда выезжаешь и как едешь).", selectSavedNoteCommandHandler.setNext(new MainMenuCommandHandler()), false) {
+								@Override
+								public String buildText(String userId) {
+									ProcessingCenter pCenter = ProcessingCenter.getInstance();
+									String text = "Введи заметку (для удобства можно написать откуда выезжаешь и как едешь).";
+									SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + userId).addSelectingField("saved_note");
+									RowArray result = request.execute();
+									if (result.next() && (result.getString("saved_note") != null)) {
+										String note = result.getString("saved_note");
+										text += "\nРанее использованная заметка: " + note + "\n1 - Использовать сохраненную заметку";
+									}
+									return text;
+								}
+							};
 							state.setName("Ввести номер телефона");
+							state.setNextHandler(new BackCommandHandler()).setNextHandler(noteHandler);
+							/*
 							state.setNextHandler(new BackCommandHandler() {
 								@Override
 								public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
@@ -477,7 +495,7 @@ public class InitializingClass {
 										final String userId = message.getUserId();
 										pCenter.setState(messenger, userId, new State("1.1.1.1", false) {
 											@Override
-											public String buildText() {
+											public String buildText(String userId) {
 												String text = "Введи номер телефона.\nP.S. бот примет любую команду, поэтому указывай либо существующий номер, либо, если не предусматриваешь связь через телефон, указывай предпочтительный способ связи.";
 												SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + userId).addSelectingField("saved_number");
 												RowArray result = request.execute();
@@ -493,10 +511,11 @@ public class InitializingClass {
 									else return getNext().handle(messenger, message, state);
 								}
 							}.setNext(noteHandler));
+							*/
 							nullState.addState(state);
 							
-								state = new State("1.1.1.1.1.1", "Установить автопубликацию?", new MainMenuCommandHandler().setNext(new UnknownCommandHandler()).setNext(confirmingAutoPostOptionHandler), false);
-								state.setName("Ввести заметку");
+								state = new State("1.1.1.1.1.1", "Установить автопубликацию?", new MainMenuCommandHandler().setNext(new UnknownCommandHandler()).setNext(confirmingAutoPostOptionHandler).setNext(new BackCommandHandler()), false);
+								/*
 								state.setNextHandler(new BackCommandHandler() {
 									@Override
 									public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
@@ -505,7 +524,7 @@ public class InitializingClass {
 											final String userId = message.getUserId();
 											pCenter.setState(messenger, userId, new State("1.1.1.1.1", false) {
 												@Override
-												public String buildText() {
+												public String buildText(String userId) {
 													String text = "Введи заметку (для удобства можно написать откуда выезжаешь и как едешь).";
 													SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + userId).addSelectingField("saved_note");
 													RowArray result = request.execute();
@@ -520,13 +539,14 @@ public class InitializingClass {
 										}
 										else return getNext().handle(messenger, message, state);
 									}
-								}.setNext(noteHandler));
+								});
+								*/
 								nullState.addState(state);
 								
-									state = new State("1.1.1.1.1.1.1", "Выбери нужный вариант. При выборе варианта \"На текущую неделю\" функция будет активирована до конца текущей недели, а не на следующие 7 дней.\n\nПримечание: если ты добавляешь автопубликацию на текующую неделю в воскресенье, то она переходит на следующую неделю. Сделано это для того, чтобы тебе не приходилось в понедельник лишний раз заходить и включать автопубликацию, если ты в воскресенье публикуешь на понедельник поездку и хочешь включить на следующую неделю опцию.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), true) {
+									state = new State("1.1.1.1.1.1.1", "Выбери нужный вариант. При выборе варианта \"На текущую неделю\" функция будет активирована до конца текущей недели, а не на следующие 7 дней.\n\nПримечание: если ты добавляешь автопубликацию на текующую неделю в воскресенье, то она переходит на следующую неделю. Сделано это для того, чтобы тебе не приходилось в понедельник лишний раз заходить и включать автопубликацию, если ты в воскресенье публикуешь на понедельник поездку и хочешь включить на следующую неделю опцию.", new MainMenuCommandHandler().setNext(new UnknownCommandHandler()), true) {
 										
 										@Override
-										public String buildText() {
+										public String buildText(String userId) {
 											StringBuilder sb = new StringBuilder(this.getMessage());
 											sb.append("\n1 - На текущую неделю\n2 - Еженедельно");
 											int itemNumber = 1;
@@ -542,6 +562,29 @@ public class InitializingClass {
 									};
 									state.setName("Да");
 									state.setNextHandler(new MessageHandler() {
+
+										@Override
+										public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
+											ProcessingCenter pCenter = ProcessingCenter.getInstance();
+											String userId = message.getUserId();
+											
+											if (!pCenter.isContainsFlight(userId)) {
+												State errState = new ErrorState();
+												errState.setMessage("Ошибка. Прошло слишком много времени или система была перезагружена. Нужно начать сначала.").setIsBackButtonOn(false);
+												pCenter.setState(messenger, userId, errState);
+												return -1;
+											}
+											
+											Flight flight = pCenter.getIncompletedFlight(userId);
+
+											if (message.getText().equals("0")) {
+												flight.setAutoPostOn(false);
+											} 
+											
+											return this.getNext().handle(messenger, message, state);
+										}
+										
+									}).setNextHandler(new MessageHandler() {
 										
 										@Override
 										public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
@@ -570,59 +613,42 @@ public class InitializingClass {
 											return this.getNext().handle(messenger, message, state);
 										}
 										
-									});
+									}).setNextHandler(new BackCommandHandler());
 									nullState.addState(state);
 									
 										state = new State("1.1.1.1.1.1.1.1", "Введи через пробел необходимые дни недели для публикации. Для ввода нужно использовать только следующие сокращения: понедельник - пн, вторник - вт, среда - ср, четверг - чт, пятница - пт, суббота - сб, воскресенье - вс.\n\nПримечание: дни недели вводятся одним сообщением, в дальнейшем дополнить их пока невозможно.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), false);
-										state.setName("Выбрать частоту");
 										state.setNextHandler(weekDaysCommandHandler);
 										nullState.addState(state);
 										
-											state = new State("1.1.1.1.1.1.1.1.1", "Проверь и подтверди публикацию.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), false);
-											state.setName("Выбрать дни недели");
-											state.setNextHandler(postConfirmingHandler);
-											state.get(0).setHandler(new MessageHandler() {
-
+											state = new State("1.1.1.1.1.1.1.1.1", "Проверь и подтверди публикацию.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()).setNext(postConfirmingHandler), false) {
 												@Override
-												public int handle(SimpleMessenger messenger,MessageStandardClass message, State state) {
-													if (message.getText().equals("0")) {
-														State nextState = ProcessingCenter.getInstance().getSavedState(message.getUserId());
-														if (nextState != null) {
-															ProcessingCenter.getInstance().setState(messenger, message.getUserId(), nextState);
-															return 1;
-														} else {
-															ProcessingCenter.getInstance().setState(messenger, message.getUserId(), new ErrorState().setMessage("Прошло слишком много времени или система была перезагружена.").setIsBackButtonOn(false));
-															return -1;
-														}
-													}
-													return this.getNext().handle(messenger, message, state);
+												public String buildText(String userId) {
+													ProcessingCenter pCenter = ProcessingCenter.getInstance();
+													Flight flight = pCenter.getIncompletedFlight(userId);
+													
+													StringBuilder result = new StringBuilder("Проверь и потверди.\n");
+													result.append(flight.getFullInfo());
+													result.append("\n1 - Подтвердить");
+													return result.toString();
 												}
-												
-											}).setNextHandler(new MainMenuCommandHandler()).setNextHandler(new UnknownCommandHandler());
+											};
 											nullState.addState(state);
-											
-												state = new State("1.1.1.1.1.1.1.1.1.1", "Запись добавлена.\nP.S. помни - водитель в ответе за тех, кого сажает в машину. Пристегивайтесь ремнями безопасности.", new MainMenuCommandHandler().setNext(new UnknownCommandHandler()), true) {
-													
-													@Override
-													public String buildText() {
-														StringBuilder sb = new StringBuilder(this.getMessage());
-														int itemNumber = 1;
-														for (int i = 1; i < this.getStatesArraySize(); i++) {
-															if (this.get(i).isMenuItem()) {
-																sb.append("\n" + itemNumber++ + " - ");
-																sb.append(this.get(i).getName());
-															}
-														}
-														return sb.toString();
-													}
-													
-												};
-												state.setName("Подтвердить").setIsBackButtonOn(false);
-												nullState.addState(state);
 									
-									state = new State("1.1.1.1.1.1.2", "Проверь и подтверди публикацию.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), true);
+									state = new State("1.1.1.1.1.1.2", "Проверь и подтверди публикацию.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), true) {
+										@Override
+										public String buildText(String userId) {
+											ProcessingCenter pCenter = ProcessingCenter.getInstance();
+											Flight flight = pCenter.getIncompletedFlight(userId);
+											
+											StringBuilder result = new StringBuilder("Проверь и потверди.\n");
+											result.append(flight.getFullInfo());
+											result.append("\n1 - Подтвердить");
+											return result.toString();
+										}
+									};
 									state.setName("Нет");
 									state.setNextHandler(postConfirmingHandler);
+									/*
 									state.get(0).setHandler(new MessageHandler() {
 
 										@Override
@@ -641,32 +667,13 @@ public class InitializingClass {
 										}
 										
 									}).setNextHandler(new MainMenuCommandHandler()).setNextHandler(new UnknownCommandHandler());
+									*/
 									nullState.addState(state);
-									
-										state = new State("1.1.1.1.1.1.2.1", "Запись добавлена.\nP.S. помни - водитель в ответе за тех, кого сажает в машину. Пристегивайтесь ремнями безопасности.", new MainMenuCommandHandler().setNext(new UnknownCommandHandler()), true) {
-											
-											@Override
-											public String buildText() {
-												StringBuilder sb = new StringBuilder(this.getMessage());
-												int itemNumber = 1;
-												for (int i = 1; i < this.getStatesArraySize(); i++) {
-													if (this.get(i).isMenuItem()) {
-														sb.append("\n" + itemNumber++ + " - ");
-														sb.append(this.get(i).getName());
-													}
-												}
-												return sb.toString();
-											}
-											
-										};
-										state.setName("Подтвердить").setIsBackButtonOn(false);
-										nullState.addState(state);
-					
 					
 			state = new State("2", "Выбери направление, по которому хочешь найти поездку.", directionHandler1.setNext(commonHandler), true) {
 				
 				@Override
-				public String buildText() {
+				public String buildText(String userId) {
 					try {
 						return this.getMessage() + Flight.getDirectionNames();
 					} catch (Exception e) {
@@ -681,15 +688,13 @@ public class InitializingClass {
 			
 				state = new State("2.1", "Выбери день, в который хочешь поехать.", dayHandler1.setNext(commonHandler), false) {
 					@Override
-					public String buildText() {
+					public String buildText(String userId) {
 						return this.getMessage() + Flight.getDayNames();
 					}
 				};
-				state.setName("Направление");
 				nullState.addState(state);
 			
 					state = new State("2.1.1", "Введи желаемое время выезда в формате ЧЧ:ММ.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new TimeCommandHandler()), false);
-					state.setName("День");
 					nullState.addState(state);
 					
 					
@@ -697,8 +702,93 @@ public class InitializingClass {
 			state.setName("О боте").setIsBackButtonOn(false);
 			nullState.addState(state);
 			
-			state = new State("4", "Включенные опции.", new MainMenuCommandHandler().setNext(new BackCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new DeleteOptionCommandHandler()), true);
-			state.setName("Включенные опции и опубликованные поездки");
+			state = new State("4", "Включенные опции.", new MainMenuCommandHandler().setNext(new BackCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new DeleteOptionCommandHandler()), true) {
+				@Override
+				public String buildText(String userId) {
+					try {
+						ProcessingCenter pCenter = ProcessingCenter.getInstance();
+						pCenter.getOptions(userId).clear();
+						SelectSQLRequest request = new SelectSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).addSelectingField("*").setWhereFields("user_id = " + userId);
+						int index = 1;
+						
+						RowArray rs = request.execute();
+						StringBuilder sb1 = new StringBuilder("Настроенные автоуведомления:\n");
+						while (rs.next()) {
+							int direction = rs.getInt("direction");
+							int day = rs.getInt("day");
+							sb1.append("Направление: ");
+							sb1.append(Flight.getDirectionString(direction));
+							sb1.append("\nДень: ");
+							sb1.append(Flight.getDayString(day));
+							sb1.append("\nВремя: ");
+							Integer tFrom = rs.getInt("time_from");
+							Integer tFromMinutes = tFrom % 60;
+							Integer tTo = rs.getInt("time_to");
+							Integer tToMinutes = tTo % 60;
+							sb1.append("с " + tFrom / 60 + ":" + (tFromMinutes < 10 ? "0" + tFromMinutes : "" + tFromMinutes) + " до " + tTo / 60 + ":" + (tToMinutes < 10 ? "0" + tToMinutes : "" + tToMinutes));
+							sb1.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
+							pCenter.addOption(userId, new AutoNotification().setId(rs.getString("id")));
+						}
+						
+						request.setTableName("auto_post");
+						rs = request.execute();
+						StringBuilder sb2 = new StringBuilder("\nНастроенные автопубликации:\n");
+						while (rs.next()) {
+							int direction = rs.getInt("direction");
+							sb2.append("Направление: ");
+							sb2.append(Flight.getDirectionString(direction));
+							sb2.append("\nВремя: ");
+							Integer time = rs.getInt("time");
+							Integer minutes = time % 60;
+							sb2.append(time / 60 + ":" +(minutes < 10 ? "0" + minutes : minutes));
+							sb2.append("\nРежим: ");
+							sb2.append(rs.getInt("frequency") == 0 ? "на текущую неделю" : "еженедельно");
+							sb2.append("\nДни: ");
+							sb2.append(rs.getString("days"));
+							sb2.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
+							pCenter.addOption(userId, new AutoPost().setId(rs.getString("id")).setDirection(rs.getString("direction")));
+						}
+						
+						request.setTableName("flights");
+						rs = request.execute();
+						StringBuilder sb3 = new StringBuilder("\nОпубликованные поездки:\n");
+						while (rs.next()) {
+							int direction = rs.getInt("direction");
+							int day = rs.getInt("day");
+							sb3.append("Направление: " + Flight.getDirectionString(direction));
+							sb3.append("\nВремя: ");
+							Integer time = rs.getInt("time");
+							Integer minutes = time % 60;
+							sb3.append(time / 60 + ":" + (minutes < 10 ? "0" + minutes : minutes));
+							sb3.append("\nДень: " + Flight.getDayString(day));
+							sb3.append("\nНомер: ");
+							sb3.append(rs.getString("number"));
+							sb3.append("\nЗаметка: ");
+							sb3.append(rs.getString("note"));
+							sb3.append("\n\nОтправь " + index++ + ", чтобы удалить.\n\n");
+							pCenter.addOption(userId, new Flight().setDay(day).setDirection(direction).setId(rs.getInt("id")));
+						}
+						
+						String result = "";
+						String str1 = sb1.toString();
+						if (!str1.replace("Настроенные автоуведомления:\n", "").trim().equals("")) result += str1;
+						String str2 = sb2.toString();
+						if (!str2.replace("Настроенные автопубликации:\n", "").trim().equals("")) result += str2;
+						String str3 = sb3.toString();
+						if(!str3.replace("Опубликованные поездки:\n", "").trim().equals("")) result += str3; 
+						if(result.trim().equals("")) {
+							result = "Включенных опций или опубликованных поездок нет.";
+						}
+						
+						return result;
+					} catch (Exception e) {
+						ProcessingCenter.logError(e);
+					}
+					return "error";
+				}
+			};
+			state.setName("Включенные опции и опубликованные поездки").setIsMainMenuButtonOn(false);
+			/*
 			state.get(0).setHandler(new MessageHandler() {
 
 				@Override
@@ -717,6 +807,7 @@ public class InitializingClass {
 				}
 				
 			}).setNextHandler(new MainMenuCommandHandler()).setNextHandler(new UnknownCommandHandler());
+			*/
 			nullState.addState(state);
 		
 		/*
@@ -726,8 +817,9 @@ public class InitializingClass {
 		 */
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader("conf.txt"));
-			GroupActor actor = new GroupActor(189799593, reader.readLine());
+			GroupActor actor = new GroupActor(190622458, reader.readLine());
 			//189799593
+			//190622458 TEST
 			Bot bot = new Bot(vk, actor);
 			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
 			Trigger dailyTrigger = TriggerBuilder.newTrigger().withIdentity("midnightTrigger", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ? *")).build();
