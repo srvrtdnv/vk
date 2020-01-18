@@ -2,6 +2,7 @@ package vkbot;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.List;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -20,6 +21,9 @@ import com.vk.api.sdk.httpclient.*;
 
 import vkbot.handler.*;
 import vkbot.job.TablesUpdatingJob;
+import vkbot.service.AutoNotificationService;
+import vkbot.service.AutoPostService;
+import vkbot.service.FlightService;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 import vkbot.state.ErrorState;
@@ -122,7 +126,7 @@ public class InitializingClass {
 					if (day <= Flight.getDaysCount() && day > 0) {
 						Flight flight = pCenter.getIncompletedFlight(userId);
 						flight.setDay(day);
-						if (flight.isExist()) {
+						if (new FlightService().isFlightExist(flight)) {
 							State err = new ErrorState().setMessage("На этот день в данном направлении у тебя уже есть поездка.").setIsBackButtonOn(false);
 							err.get(0).setFullId("saved state");
 							pCenter.setSavedState(userId, err);
@@ -298,7 +302,8 @@ public class InitializingClass {
 				
 				if (message.getText().equals("1")) {
 					flight.setAutoPostOn(true);
-					if (flight.isAutoPostExist()) {
+					AutoPost autoP = new AutoPost().setDays(flight.getAutoPostDays()).setDirection(flight.getDirection()).setFrequency(flight.getFrequency()).setTime(flight.getTime()).setUserId(flight.getUserId()).setNote(flight.getNote()).setNumber(flight.getNumber());
+					if (new AutoPostService().isAutoPostExist(autoP)) {
 						State err = new ErrorState().setMessage("Автопубликация в этом направлении уже активирована.").setPrevState(state).setNextHandler(new BackCommandHandler());
 						flight.setAutoPostOn(false);
 						pCenter.setSavedState(userId, err);
@@ -601,11 +606,11 @@ public class InitializingClass {
 											Flight flight = pCenter.getIncompletedFlight(userId);
 											
 											if (message.getText().equals("1")) {
-												flight.setFrequency(false);
+												flight.setFrequency(0);
 												pCenter.setState(messenger, userId, state.get(1));
 												return 1;
 											} else if (message.getText().equals("2")) {
-												flight.setFrequency(true);
+												flight.setFrequency(1);
 												pCenter.setState(messenger, userId, state.get(1));
 												return 1;
 											}
@@ -708,79 +713,36 @@ public class InitializingClass {
 					try {
 						ProcessingCenter pCenter = ProcessingCenter.getInstance();
 						pCenter.getOptions(userId).clear();
-						SelectSQLRequest request = new SelectSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).addSelectingField("*").setWhereFields("user_id = " + userId);
 						int index = 1;
 						
-						RowArray rs = request.execute();
-						StringBuilder sb1 = new StringBuilder("Настроенные автоуведомления:\n");
-						while (rs.next()) {
-							int direction = rs.getInt("direction");
-							int day = rs.getInt("day");
-							sb1.append("Направление: ");
-							sb1.append(Flight.getDirectionString(direction));
-							sb1.append("\nДень: ");
-							sb1.append(Flight.getDayString(day));
-							sb1.append("\nВремя: ");
-							Integer tFrom = rs.getInt("time_from");
-							Integer tFromMinutes = tFrom % 60;
-							Integer tTo = rs.getInt("time_to");
-							Integer tToMinutes = tTo % 60;
-							sb1.append("с " + tFrom / 60 + ":" + (tFromMinutes < 10 ? "0" + tFromMinutes : "" + tFromMinutes) + " до " + tTo / 60 + ":" + (tToMinutes < 10 ? "0" + tToMinutes : "" + tToMinutes));
-							sb1.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
-							pCenter.addOption(userId, new AutoNotification().setId(rs.getString("id")));
+						StringBuilder result = new StringBuilder("");
+						List<AutoNotification> autoNs = new AutoNotificationService().getAllByUserId(userId);
+						if (autoNs.size() > 0) result.append("&#128315;Настроенные автоуведомления&#128315;\n");
+						for (AutoNotification autoN : autoNs) {
+							result.append(autoN);
+							result.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
+							pCenter.addOption(userId, autoN);
 						}
 						
-						request.setTableName("auto_post");
-						rs = request.execute();
-						StringBuilder sb2 = new StringBuilder("\nНастроенные автопубликации:\n");
-						while (rs.next()) {
-							int direction = rs.getInt("direction");
-							sb2.append("Направление: ");
-							sb2.append(Flight.getDirectionString(direction));
-							sb2.append("\nВремя: ");
-							Integer time = rs.getInt("time");
-							Integer minutes = time % 60;
-							sb2.append(time / 60 + ":" +(minutes < 10 ? "0" + minutes : minutes));
-							sb2.append("\nРежим: ");
-							sb2.append(rs.getInt("frequency") == 0 ? "на текущую неделю" : "еженедельно");
-							sb2.append("\nДни: ");
-							sb2.append(rs.getString("days"));
-							sb2.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
-							pCenter.addOption(userId, new AutoPost().setId(rs.getString("id")).setDirection(rs.getString("direction")));
+						List<AutoPost> autoPs = new AutoPostService().getAllByUserId(userId);
+						if (autoPs.size() > 0) result.append("\n&#128315;Настроенные автопубликации&#128315;\n");
+						for (AutoPost autoP : autoPs) {
+							result.append(autoP);
+							result.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
+							pCenter.addOption(userId, autoP);
 						}
 						
-						request.setTableName("flights");
-						rs = request.execute();
-						StringBuilder sb3 = new StringBuilder("\nОпубликованные поездки:\n");
-						while (rs.next()) {
-							int direction = rs.getInt("direction");
-							int day = rs.getInt("day");
-							sb3.append("Направление: " + Flight.getDirectionString(direction));
-							sb3.append("\nВремя: ");
-							Integer time = rs.getInt("time");
-							Integer minutes = time % 60;
-							sb3.append(time / 60 + ":" + (minutes < 10 ? "0" + minutes : minutes));
-							sb3.append("\nДень: " + Flight.getDayString(day));
-							sb3.append("\nНомер: ");
-							sb3.append(rs.getString("number"));
-							sb3.append("\nЗаметка: ");
-							sb3.append(rs.getString("note"));
-							sb3.append("\n\nОтправь " + index++ + ", чтобы удалить.\n\n");
-							pCenter.addOption(userId, new Flight().setDay(day).setDirection(direction).setId(rs.getInt("id")));
+						List<Flight> flights = new FlightService().getAllByUserId(userId);
+						if (flights.size() > 0) result.append("\n&#128315;Опубликованные поездки&#128315;\n");
+						for (Flight flight : flights) {
+							result.append(flight.toStringWOAutoPost());
+							result.append("\n\nОтправь " + index++ + ", чтобы удалить.\n\n");
+							pCenter.addOption(userId, flight);
 						}
 						
-						String result = "";
-						String str1 = sb1.toString();
-						if (!str1.replace("Настроенные автоуведомления:\n", "").trim().equals("")) result += str1;
-						String str2 = sb2.toString();
-						if (!str2.replace("Настроенные автопубликации:\n", "").trim().equals("")) result += str2;
-						String str3 = sb3.toString();
-						if(!str3.replace("Опубликованные поездки:\n", "").trim().equals("")) result += str3; 
-						if(result.trim().equals("")) {
-							result = "Включенных опций или опубликованных поездок нет.";
-						}
+						if (result.toString().equals("")) result.append("Включенных опций или опубликованных поездок нет.");
 						
-						return result;
+						return result.toString();
 					} catch (Exception e) {
 						ProcessingCenter.logError(e);
 					}

@@ -1,50 +1,46 @@
 package vkbot;
 
-import vkbot.sql.DeleteSQLRequest;
-import vkbot.sql.InsertSQLRequest;
-import vkbot.sql.SelectSQLRequest;
+import javax.persistence.*;
 
+import vkbot.service.AutoNotificationService;
+
+@Entity
+@Table(name = "auto_notifications")
 public class AutoNotification implements Deletable {
 	
-	private String id, timeFrom, timeTo, direction, day, userId, time;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	@Column(name = "user_id")
+	private String userId;
+	@Column(name = "time_from")
+	private int timeFrom;
+	@Column(name = "time_to")
+	private int timeTo;
+	private int direction, day;
+	@Transient
+	private int time;
 	
 	@Override
 	public int deleteFromTable() {
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
-		DeleteSQLRequest request = new DeleteSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields(" id = " + this.getId());
-		int result = request.execute();
-		return result;
+		return new AutoNotificationService().remove(this);
 	}
 	
 	public int post() {
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
-		InsertSQLRequest request = new InsertSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName());
-		request.putValue("time_from", timeFrom);
-		request.putValue("time_to", timeTo);
-		request.putValue("user_id", "\"" + userId + "\"");
-		request.putValue("day", day);
-		request.putValue("direction", direction);
-		int result = request.execute();
-		return result;
-	}
-	
-	public boolean isExist() {
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
-		SelectSQLRequest request = new SelectSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).addSelectingField("*").setWhereFields(" user_id = \"" + getUserId() + "\" AND direction = " + getDirection() + " AND day = " + getDay());
-		return request.execute().next();
+		return new AutoNotificationService().save(this);
 	}
 
-	public AutoNotification setId(String id) {
+	public AutoNotification setId(int id) {
 		this.id = id;
 		return this;
 	}
 
-	public AutoNotification setTimeFrom(String timeFrom) {
+	public AutoNotification setTimeFrom(int timeFrom) {
 		this.timeFrom = timeFrom;
 		return this;
 	}
 
-	public AutoNotification setTimeTo(String timeTo) {
+	public AutoNotification setTimeTo(int timeTo) {
 		this.timeTo = timeTo;
 		return this;
 	}
@@ -54,38 +50,61 @@ public class AutoNotification implements Deletable {
 		return this;
 	}
 
-	public String getDirection() {
+	public int getDirection() {
 		return direction;
 	}
 
-	public AutoNotification setDay(String day) {
+	public AutoNotification setDay(int day) {
 		this.day = day;
 		return this;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public String getTimeFrom() {
+	public int getTimeFrom() {
 		return timeFrom;
 	}
 
-	public String getTimeTo() {
+	public int getTimeTo() {
 		return timeTo;
 	}
 
-	public AutoNotification setDirection(String direction) {
+	public AutoNotification setDirection(int direction) {
 		this.direction = direction;
 		return this;
 	}
 
-	public String getDay() {
+	public int getDay() {
 		return day;
 	}
 	
 	public String getUserId() {
 		return this.userId;
+	}
+
+	public int getTime() {
+		return time;
+	}
+
+	public AutoNotification setTime(int time) {
+		this.time = time;
+		return this;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("");
+		Integer tFromMinutes = timeFrom % 60;
+		Integer tToMinutes = timeTo % 60;
+		sb.append("Направление: ");
+		sb.append(Flight.getDirectionString(direction));
+		sb.append("\nДень: ");
+		sb.append(Flight.getDayString(day));
+		sb.append("\nВремя: ");
+		sb.append("с " + timeFrom / 60 + ":" + (tFromMinutes < 10 ? "0" + tFromMinutes : "" + tFromMinutes) + " до " + timeTo / 60 + ":" + (tToMinutes < 10 ? "0" + tToMinutes : "" + tToMinutes));
+		return sb.toString();
 	}
 
 }
