@@ -2,9 +2,7 @@ vkbot\InitializingClass$1.class
 vkbot\InitializingClass$14.class
 vkbot\state\FlightInfoState.class
 vkbot\handler\TimeCommandHandler.class
-vkbot\handler\OptionsListCommandHandler$1.class
 vkbot\state\State.class
-vkbot\handler\OptionsListCommandHandler.class
 vkbot\InitializingClass$4.class
 vkbot\ProcessingCenter.class
 vkbot\state\ErrorState.class
@@ -30,16 +28,19 @@ vkbot\SimpleMessenger.class
 vkbot\InitializingClass$20.class
 vkbot\service\AutoPostService.class
 vkbot\Flight.class
+vkbot\dao\JDBCFlightDAO.class
 vkbot\dao\AutoPostDAO.class
 vkbot\InitializingClass$18.class
 vkbot\handler\TimeCommandHandler$1.class
 vkbot\MessageStandardClass.class
 vkbot\sql\SelectSQLRequest.class
+vkbot\dao\JDBCAutoPostDAO.class
 vkbot\sql\InsertOnDuplicateKeySQLRequest.class
 vkbot\handler\MessageHandler.class
 vkbot\InitializingClass$3.class
 vkbot\dao\HibernateAutoPostDAO.class
 vkbot\handler\MainMenuCommandHandler.class
+vkbot\dao\JDBCAutoNotificationDAO.class
 vkbot\sql\DeleteSQLRequest.class
 vkbot\job\RandIdTableUpdatingJob.class
 vkbot\InitializingClass$10$1.class
@@ -51,6 +52,7 @@ vkbot\InitializingClass$6.class
 vkbot\InitializingClass$16.class
 vkbot\Bot.class
 vkbot\AutoPost.class
+vkbot\dao\HibernateSessionFactoryHolder.class
 vkbot\handler\FastFlightFindCommandHandler.class
 vkbot\service\FlightService.class
 vkbot\InitializingClass$13.class

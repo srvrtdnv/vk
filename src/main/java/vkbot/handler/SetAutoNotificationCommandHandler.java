@@ -29,7 +29,7 @@ public class SetAutoNotificationCommandHandler extends MessageHandler {
 			switch (autoN.post()) {
 			case -1:
 			case 0:
-				messenger.sendText(new MessageStandardClass("На этот день в этом направлении функция автоуведомления у тебя уже активирована.", userId, null, null));
+				messenger.sendText(new MessageStandardClass("На этот день в этом направлении функция автоуведомления у тебя уже активирована&#8252;", userId, null, null));
 				pCenter.setState(messenger, userId, NullState.getState(""));
 				break;
 			case 1:

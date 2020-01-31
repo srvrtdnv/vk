@@ -67,7 +67,7 @@ public class Flight implements Deletable {
 		int result = 1;
 		if (fService.save(this) < 1) return -1;
 		List<String> userIds = new AutoNotificationService().getAllUserIdsByDDT(new AutoNotification().setDay(this.getDay()).setDirection(this.getDirection()).setTime(this.getTime()));
-		if (userIds.size() > 0) pCenter.setStateWithUserIds(messenger, userIds, new State("saved state", false).setMessage("Автоуведомление.\n" + this.getFullInfo().replaceAll("Автопубликация.*", "")).setHandler(new BackCommandHandler().setNext(new MainMenuCommandHandler().setNext(new UnknownCommandHandler()))));
+		if (userIds.size() > 0) pCenter.setStateWithUserIds(messenger, userIds, new State("saved state", false).setMessage("&#128232;Автоуведомление&#128232;\n" + this.getFullInfo().replaceAll("Автопубликация.*", "")).setHandler(new BackCommandHandler().setNext(new MainMenuCommandHandler().setNext(new UnknownCommandHandler()))));
 		if (isAutoPostOn) {
 			String nextDay = "";
 			switch (new Date().getDay()) {
@@ -130,7 +130,7 @@ public class Flight implements Deletable {
 			result.append("\nАвтопубликация: нет");
 		} else {
 			result.append("\nАвтопубликация: ");
-			result.append(this.getFrequency() == 0 ? "еженедельно" : "на текущую неделю");
+			result.append(this.getFrequency() == 0 ? "на текущую неделю" : "еженедельно");
 			result.append("\nВыбранные дни: ");
 			result.append(this.getAutoPostDays());
 		}

@@ -41,7 +41,7 @@ public class FastCreateFlightCommandHandler extends MessageHandler {
 			}
 			Flight flight = new Flight().setDay(day).setDirection(direction).setTime(hours * 60 + minutes).setUserId(userId);
 			if (new FlightService().isFlightExist(flight)) {
-				State err = new ErrorState().setMessage("На этот день в данном направлении у тебя уже есть поездка.").setIsBackButtonOn(false);
+				State err = new ErrorState().setMessage("На этот день в данном направлении у тебя уже есть поездка&#8252;").setIsBackButtonOn(false);
 				err.get(0).setFullId("saved state");
 				pCenter.setSavedState(userId, err);
 				pCenter.setState(messenger, userId, err);

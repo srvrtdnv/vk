@@ -55,7 +55,6 @@ public class JDBCAutoPostDAO implements AutoPostDAO {
 		request.putValue("direction", autoP.getDirection() + "");
 		request.putValue("number", "\"" + autoP.getNumber() + "\"");
 		request.putValue("note", "\"" + autoP.getNote() + "\"");
-		System.out.println("SAVE");
 		return request.execute();
 	}
 

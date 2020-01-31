@@ -7,7 +7,7 @@ import vkbot.state.State;
 /*
  * обработчик установки автопубликаций
  * (оказался не особо нужным)
- * в данный момент существует для симметрии
+ * в данный момент существует просто 
  */
 
 public class SetAutoPostCommandHandler extends MessageHandler {
