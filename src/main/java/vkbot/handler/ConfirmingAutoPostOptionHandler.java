@@ -12,7 +12,7 @@ import vkbot.state.State;
 public class ConfirmingAutoPostOptionHandler extends MessageHandler {
 	@Override
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
+		ProcessingCenter pCenter = this.getPCenter();
 		String userId = message.getUserId();
 		Flight flight = pCenter.getIncompletedFlight(userId);
 		

@@ -10,7 +10,7 @@ import vkbot.state.State;
 public class PhoneNumberHandler extends MessageHandler {
 	@Override
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
-		final ProcessingCenter pCenter = ProcessingCenter.getInstance();
+		final ProcessingCenter pCenter = this.getPCenter();
 		final String userId = message.getUserId();
 		
 		if (!pCenter.isContainsFlight(userId)) {

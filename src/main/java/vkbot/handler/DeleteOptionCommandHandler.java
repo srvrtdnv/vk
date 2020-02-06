@@ -14,14 +14,14 @@ public class DeleteOptionCommandHandler extends MessageHandler {
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
 		try {
 			Integer index = Integer.parseInt(message.getText());
-			ProcessingCenter pCenter = ProcessingCenter.getInstance();
+			ProcessingCenter pCenter = this.getPCenter();
 			String userId = message.getUserId();
 			List<Deletable> optionsList = pCenter.getOptions(userId);
 			optionsList.get(index - 1).deleteFromTable();
 			pCenter.setState(messenger, userId, state);
 			return 1;
 		} catch (Exception e) {
-			ProcessingCenter.logError(e);
+			this.getPCenter().logError(e);
 		}
 		return this.getNext().handle(messenger, message, state);
 	}

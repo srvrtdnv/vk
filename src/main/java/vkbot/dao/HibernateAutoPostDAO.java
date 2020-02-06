@@ -4,7 +4,7 @@ import java.util.List;
 
 import vkbot.AutoPost;
 
-public class HibernateAutoPostDAO implements AutoPostDAO {
+public class HibernateAutoPostDAO extends AutoPostDAO {
 
 	@Override
 	public List<AutoPost> getAll() {

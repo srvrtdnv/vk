@@ -12,7 +12,7 @@ public class PostConfirmingHandler extends MessageHandler {
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
 		if (message.getText().equals("1")) {
 			String userId = message.getUserId();
-			ProcessingCenter pCenter = ProcessingCenter.getInstance();
+			ProcessingCenter pCenter = this.getPCenter();
 			
 			if (!pCenter.isContainsFlight(userId)) {
 				State errState = new ErrorState();

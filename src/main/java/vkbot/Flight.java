@@ -40,6 +40,8 @@ public class Flight implements Deletable {
 	private boolean isAutoPostOn = false;
 	@Transient
 	private int accuracyMinus, accuracyPlus, frequency;
+	@Transient
+	private ProcessingCenter pCenter = ProcessingCenter.getInstance();
 	
 	static {
 		try {
@@ -62,7 +64,6 @@ public class Flight implements Deletable {
 	}
 	
 	public int post(SimpleMessenger messenger) {
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
 		FlightService fService = new FlightService();
 		int result = 1;
 		if (fService.save(this) < 1) return -1;
@@ -219,6 +220,11 @@ public class Flight implements Deletable {
 		return this;
 	}
 	
+	public Flight setPCenter(ProcessingCenter pCenter) {
+		this.pCenter = pCenter;
+		return this;
+	}
+	
 	public int getAccuracyMinus() {
 		return this.accuracyMinus;
 	}
@@ -274,6 +280,10 @@ public class Flight implements Deletable {
 	
 	public int getTimeTo() {
 		return this.time + this.accuracyPlus;
+	}
+	
+	public ProcessingCenter getPcenter() {
+		return pCenter;
 	}
 	
 	public static int getDirectionsCount() {

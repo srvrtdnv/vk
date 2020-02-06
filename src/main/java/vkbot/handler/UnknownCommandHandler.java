@@ -15,7 +15,7 @@ public class UnknownCommandHandler extends MessageHandler {
 	@Override
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
 		messenger.sendText(new MessageStandardClass("&#10071;Некорректная команда. Попробуй еще раз.&#10071;", message.getUserId(), null, null));
-		ProcessingCenter.getInstance().setState(messenger, message.getUserId(), state);
+		this.getPCenter().setState(messenger, message.getUserId(), state);
 		return -1;
 	}
 

@@ -2,6 +2,7 @@ package vkbot.state;
 
 import java.util.ArrayList;
 
+import vkbot.ProcessingCenter;
 import vkbot.handler.MessageHandler;
 
 public class State {
@@ -11,10 +12,10 @@ public class State {
 	private State prevState;
 	private MessageHandler handler;
 	private ArrayList<State> states = new ArrayList<State>();
+	private ProcessingCenter pCenter = ProcessingCenter.getInstance();
 	
 	{
-			if (this instanceof UnknownMessageState) states.add(this);
-			//else states.add(new UnknownMessage)
+		if (this instanceof UnknownMessageState) states.add(this);
 	}
 	
 	
@@ -160,6 +161,14 @@ public class State {
 		states.add(index, state);
 		state.setPrevState(this);
 		return this;
+	}
+
+	public ProcessingCenter getPCenter() {
+		return pCenter;
+	}
+
+	public void setPCenter(ProcessingCenter pCenter) {
+		this.pCenter = pCenter;
 	}
 	
 }

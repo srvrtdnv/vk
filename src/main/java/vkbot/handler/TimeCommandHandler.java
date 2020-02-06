@@ -22,7 +22,7 @@ public class TimeCommandHandler extends MessageHandler {
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
 		try {
 			State newState;
-			final ProcessingCenter pCenter = ProcessingCenter.getInstance();
+			final ProcessingCenter pCenter = this.getPCenter();
 			final String userId = message.getUserId();
 			String text = message.getText().replaceAll("\\s+", " ");
 			String[] array = text.split(" ");

@@ -14,7 +14,7 @@ public class FastFlightFindCommandHandler extends MessageHandler {
 	
 	@Override
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
-		final ProcessingCenter pCenter = ProcessingCenter.getInstance();
+		final ProcessingCenter pCenter = this.getPCenter();
 		final String userId = message.getUserId();
 		String text = message.getText().trim().toLowerCase().replaceAll("\\s+", " ");
 		String[] directionNames = Flight.getDirectionNames().trim().replaceAll("\\d+\\s-\\s", "").split("\n");

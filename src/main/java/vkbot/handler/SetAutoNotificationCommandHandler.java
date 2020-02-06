@@ -16,7 +16,7 @@ public class SetAutoNotificationCommandHandler extends MessageHandler {
 	@Override
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
 		if (message.getText().equals("000")) {
-			ProcessingCenter pCenter = ProcessingCenter.getInstance();
+			ProcessingCenter pCenter = this.getPCenter();
 			String userId = message.getUserId();
 			String[] arr = state.getName().split(":");
 			int direction = Integer.parseInt(arr[0]);

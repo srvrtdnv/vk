@@ -5,6 +5,7 @@ import vkbot.state.State;
 
 public abstract class MessageHandler {
 	private MessageHandler next;
+	private ProcessingCenter pCenter = ProcessingCenter.getInstance();
 		
 	public MessageHandler setNext(MessageHandler next) {
 		if (this.next == null) {
@@ -25,4 +26,12 @@ public abstract class MessageHandler {
 	}
 	
 	public abstract int handle(SimpleMessenger messenger, MessageStandardClass message, State state);
+
+	public ProcessingCenter getPCenter() {
+		return pCenter;
+	}
+
+	public void setPCenter(ProcessingCenter pCenter) {
+		this.pCenter = pCenter;
+	}
 }

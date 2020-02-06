@@ -18,7 +18,7 @@ public class WeekDaysCommandHandler extends MessageHandler {
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
 		String text = message.getText();
 		String userId = message.getUserId();
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
+		ProcessingCenter pCenter = this.getPCenter();
 		
 		if (!pCenter.isContainsFlight(userId)) {
 			State errState = new ErrorState();

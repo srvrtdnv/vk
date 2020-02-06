@@ -9,7 +9,7 @@ import vkbot.state.State;
 public class FlightSearchingDirectionHandler extends MessageHandler {
 	@Override
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
+		ProcessingCenter pCenter = this.getPCenter();
 		String userId = message.getUserId();
 		String text = message.getText();
 		try {
@@ -21,7 +21,7 @@ public class FlightSearchingDirectionHandler extends MessageHandler {
 				return 1;
 			}
 		} catch (Exception e) {
-			ProcessingCenter.logError(e);
+			this.getPCenter().logError(e);
 		}
 		return this.getNext().handle(messenger, message, state);
 	}

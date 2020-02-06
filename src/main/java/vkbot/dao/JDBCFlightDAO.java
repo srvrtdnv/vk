@@ -11,11 +11,11 @@ import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 import vkbot.state.FlightInfoState;
 
-public class JDBCFlightDAO implements FlightDAO {
+public class JDBCFlightDAO extends FlightDAO {
 
 	@Override
 	public int save(Flight flight) {
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
+		ProcessingCenter pCenter = this.getPCenter();
 		InsertSQLRequest request = new InsertSQLRequest("vk_bot", "flights", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName());
 		request.putValue("time", "" + flight.getTime());
 		request.putValue("user_id", "\"" + flight.getUserId() + "\"");

@@ -4,16 +4,28 @@ import java.util.List;
 
 import vkbot.AutoNotification;
 import vkbot.Flight;
+import vkbot.ProcessingCenter;
 
-public interface AutoNotificationDAO {
-	List<AutoNotification> getAll();
+public abstract class AutoNotificationDAO {
+	private ProcessingCenter pCenter = ProcessingCenter.getInstance();
+	
+	abstract List<AutoNotification> getAll();
 	/*
 	 * DDT - day, direction, time
 	 */
-	List<String> getAllUserIdsByDDT(AutoNotification autoN);
-	List<AutoNotification> getAllByDD(AutoNotification autoN);
-	List<AutoNotification> getAllByUserId(String userId);
-	int save(AutoNotification autoN);
-	int remove(AutoNotification autoN);
-	boolean isAutoNExist(AutoNotification autoN);
+	abstract List<String> getAllUserIdsByDDT(AutoNotification autoN);
+	abstract List<AutoNotification> getAllByDD(AutoNotification autoN);
+	abstract List<AutoNotification> getAllByUserId(String userId);
+	abstract int save(AutoNotification autoN);
+	abstract int remove(AutoNotification autoN);
+	abstract boolean isAutoNExist(AutoNotification autoN);
+	
+	public ProcessingCenter getPCenter() {
+		return pCenter;
+	}
+	
+	public void setPCenter(ProcessingCenter pCenter) {
+		this.pCenter = pCenter;
+	}
+	
 }

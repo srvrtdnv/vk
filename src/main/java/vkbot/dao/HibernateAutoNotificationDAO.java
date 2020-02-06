@@ -4,7 +4,7 @@ import java.util.List;
 
 import vkbot.AutoNotification;
 
-public class HibernateAutoNotificationDAO implements AutoNotificationDAO {
+public class HibernateAutoNotificationDAO extends AutoNotificationDAO {
 
 	@Override
 	public List<AutoNotification> getAll() {

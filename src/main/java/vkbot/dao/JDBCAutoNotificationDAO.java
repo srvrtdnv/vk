@@ -10,7 +10,7 @@ import vkbot.sql.InsertSQLRequest;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 
-public class JDBCAutoNotificationDAO implements AutoNotificationDAO {
+public class JDBCAutoNotificationDAO extends AutoNotificationDAO {
 
 	@Override
 	public List<AutoNotification> getAll() {
@@ -20,7 +20,7 @@ public class JDBCAutoNotificationDAO implements AutoNotificationDAO {
 
 	@Override
 	public List<String> getAllUserIdsByDDT(AutoNotification autoN) {
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
+		ProcessingCenter pCenter = this.getPCenter();
 		SelectSQLRequest selectRequest = new SelectSQLRequest("vk_bot", "auto_notifications", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).addSelectingField("user_id").setWhereFields("time_from < " + autoN.getTime() + " AND time_to > " + autoN.getTime() + " AND direction = " + autoN.getDirection() + " AND day = " + autoN.getDay());
 		RowArray res = selectRequest.execute();
 		List<String> userIds = new ArrayList<String>();

@@ -9,7 +9,6 @@ import vkbot.state.State;
  * +
  * класс-заглушка
  * 
- * ну просто шоб было
  */
 public class NullHandler extends MessageHandler {
 	private static MessageHandler instance;

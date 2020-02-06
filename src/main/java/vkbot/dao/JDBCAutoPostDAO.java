@@ -10,7 +10,7 @@ import vkbot.sql.InsertSQLRequest;
 import vkbot.sql.RowArray;
 import vkbot.sql.SelectSQLRequest;
 
-public class JDBCAutoPostDAO implements AutoPostDAO {
+public class JDBCAutoPostDAO extends AutoPostDAO {
 
 	@Override
 	public List<AutoPost> getAll() {
@@ -27,7 +27,7 @@ public class JDBCAutoPostDAO implements AutoPostDAO {
 	@Override
 	public List<AutoPost> getAllByUserId(String userId) {
 		List<AutoPost> autoPs = new ArrayList<AutoPost>();
-		ProcessingCenter pCenter = ProcessingCenter.getInstance();
+		ProcessingCenter pCenter = this.getPCenter();
 		SelectSQLRequest request = new SelectSQLRequest("vk_bot", "auto_post", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).addSelectingField("*").setWhereFields("user_id = " + userId);
 		RowArray rs = request.execute();
 		while (rs.next()) {

@@ -11,7 +11,7 @@ public class SelectSavedNumberCommandHandler extends MessageHandler {
 	@Override
 	public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
 		if (message.getText().equals("1")) {
-			ProcessingCenter pCenter = ProcessingCenter.getInstance();
+			ProcessingCenter pCenter = this.getPCenter();
 			SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + message.getUserId()).addSelectingField("saved_number");
 			RowArray result = request.execute();
 			if (result.next() && (result.getString("saved_number") != null)) {

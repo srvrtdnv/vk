@@ -48,12 +48,6 @@ public class InitializingClass {
 		 * ДАЛЬШЕ ИДЕТ ОЧЕНЬ СТРАШНАЯ ЧАСТЬ
 		 */
 		
-		
-		
-		/*
-		 * далее идет само дерево состояний
-		 */
-		
 		NullState nullState = NullState.getInstance();
 		MessageHandler commonHandler = ProcessingCenter.getInstance().getHandler();
 		
@@ -63,7 +57,7 @@ public class InitializingClass {
 
 			@Override
 			public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
-				ProcessingCenter pCenter = ProcessingCenter.getInstance();
+				ProcessingCenter pCenter = this.getPCenter();
 				pCenter.setState(messenger, message.getUserId(), state);
 				return 1;
 			}
@@ -79,12 +73,7 @@ public class InitializingClass {
 				
 				@Override
 				public String buildText(String userId) {
-					try {
-						return this.getMessage() + Flight.getDirectionNames();
-					} catch (Exception e) {
-						ProcessingCenter.logError(e);
-					}
-					return "error";
+					return this.getMessage() + Flight.getDirectionNames();
 				}
 				
 			};
@@ -109,7 +98,7 @@ public class InitializingClass {
 						state = new State("1.1.1.1", "Введи номер телефона.\nP.S. бот примет любую команду, поэтому указывай либо существующий номер, либо, если не предусматриваешь связь через телефон, указывай предпочтительный способ связи.", new SelectSavedNumberCommandHandler().setNext(new BackCommandHandler()).setNext(new MainMenuCommandHandler()).setNext(new PhoneNumberHandler()), false) {
 							@Override
 							public String buildText(String userId) {
-								ProcessingCenter pCenter = ProcessingCenter.getInstance();
+								ProcessingCenter pCenter = this.getPCenter();
 								String text = "Введи номер телефона.\nP.S. бот примет любую команду, поэтому указывай либо существующий номер, либо, если не предусматриваешь связь через телефон, указывай предпочтительный способ связи.";
 								SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + userId).addSelectingField("saved_number");
 								RowArray result = request.execute();
@@ -125,7 +114,7 @@ public class InitializingClass {
 							state = new State("1.1.1.1.1", "Введи заметку (для удобства можно написать откуда выезжаешь и как едешь).", new SelectSavedNoteCommandHandler().setNext(new MainMenuCommandHandler()), false) {
 								@Override
 								public String buildText(String userId) {
-									ProcessingCenter pCenter = ProcessingCenter.getInstance();
+									ProcessingCenter pCenter = this.getPCenter();
 									String text = "Введи заметку (для удобства можно написать откуда выезжаешь и как едешь).";
 									SelectSQLRequest request = new SelectSQLRequest("vk_bot", "user_ids", "root", pCenter.getUrl(), pCenter.getDriver(), pCenter.getPassFileName()).setWhereFields("user_id = " + userId).addSelectingField("saved_note");
 									RowArray result = request.execute();
@@ -164,7 +153,7 @@ public class InitializingClass {
 
 										@Override
 										public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
-											ProcessingCenter pCenter = ProcessingCenter.getInstance();
+											ProcessingCenter pCenter = this.getPCenter();
 											String userId = message.getUserId();
 											
 											if (!pCenter.isContainsFlight(userId)) {
@@ -187,7 +176,7 @@ public class InitializingClass {
 										
 										@Override
 										public int handle(SimpleMessenger messenger, MessageStandardClass message, State state) {
-											ProcessingCenter pCenter = ProcessingCenter.getInstance();
+											ProcessingCenter pCenter = this.getPCenter();
 											String userId = message.getUserId();
 											
 											if (!pCenter.isContainsFlight(userId)) {
@@ -222,7 +211,7 @@ public class InitializingClass {
 											state = new State("1.1.1.1.1.1.1.1.1", "Проверь и подтверди публикацию.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new PostConfirmingHandler()), false) {
 												@Override
 												public String buildText(String userId) {
-													ProcessingCenter pCenter = ProcessingCenter.getInstance();
+													ProcessingCenter pCenter = this.getPCenter();
 													Flight flight = pCenter.getIncompletedFlight(userId);
 													
 													StringBuilder result = new StringBuilder("Проверь и потверди.\n");
@@ -236,7 +225,7 @@ public class InitializingClass {
 									state = new State("1.1.1.1.1.1.2", "Проверь и подтверди публикацию.", new BackCommandHandler().setNext(new MainMenuCommandHandler()).setNext(new UnknownCommandHandler()), true) {
 										@Override
 										public String buildText(String userId) {
-											ProcessingCenter pCenter = ProcessingCenter.getInstance();
+											ProcessingCenter pCenter = this.getPCenter();
 											Flight flight = pCenter.getIncompletedFlight(userId);
 											
 											StringBuilder result = new StringBuilder("Проверь и потверди.\n");
@@ -253,12 +242,7 @@ public class InitializingClass {
 				
 				@Override
 				public String buildText(String userId) {
-					try {
 						return this.getMessage() + Flight.getDirectionNames();
-					} catch (Exception e) {
-						ProcessingCenter.logError(e);
-					}
-					return "error";
 				}
 				
 			};
@@ -284,43 +268,38 @@ public class InitializingClass {
 			state = new State("4", "Включенные опции.", new MainMenuCommandHandler().setNext(new BackCommandHandler()).setNext(new UnknownCommandHandler()).setNext(new DeleteOptionCommandHandler()), true) {
 				@Override
 				public String buildText(String userId) {
-					try {
-						ProcessingCenter pCenter = ProcessingCenter.getInstance();
-						pCenter.getOptions(userId).clear();
-						int index = 1;
-						
-						StringBuilder result = new StringBuilder("");
-						List<AutoNotification> autoNs = new AutoNotificationService().getAllByUserId(userId);
-						if (autoNs.size() > 0) result.append("&#9200;Настроенные автоуведомления&#9200;\n");
-						for (AutoNotification autoN : autoNs) {
-							result.append(autoN);
-							result.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
-							pCenter.addOption(userId, autoN);
-						}
-						
-						List<AutoPost> autoPs = new AutoPostService().getAllByUserId(userId);
-						if (autoPs.size() > 0) result.append("\n&#9851;Настроенные автопубликации&#9851;\n");
-						for (AutoPost autoP : autoPs) {
-							result.append(autoP);
-							result.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
-							pCenter.addOption(userId, autoP);
-						}
-						
-						List<Flight> flights = new FlightService().getAllByUserId(userId);
-						if (flights.size() > 0) result.append("\n&#128664;Опубликованные поездки&#128664;\n");
-						for (Flight flight : flights) {
-							result.append(flight.toStringWOAutoPost());
-							result.append("\n\nОтправь " + index++ + ", чтобы удалить.\n\n");
-							pCenter.addOption(userId, flight);
-						}
-						
-						if (result.toString().equals("")) result.append("Включенных опций или опубликованных поездок нет.");
-						
-						return result.toString();
-					} catch (Exception e) {
-						ProcessingCenter.logError(e);
+					ProcessingCenter pCenter = this.getPCenter();
+					pCenter.getOptions(userId).clear();
+					int index = 1;
+					
+					StringBuilder result = new StringBuilder("");
+					List<AutoNotification> autoNs = new AutoNotificationService().getAllByUserId(userId);
+					if (autoNs.size() > 0) result.append("&#9200;Настроенные автоуведомления&#9200;\n");
+					for (AutoNotification autoN : autoNs) {
+						result.append(autoN);
+						result.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
+						pCenter.addOption(userId, autoN);
 					}
-					return "error";
+					
+					List<AutoPost> autoPs = new AutoPostService().getAllByUserId(userId);
+					if (autoPs.size() > 0) result.append("\n&#9851;Настроенные автопубликации&#9851;\n");
+					for (AutoPost autoP : autoPs) {
+						result.append(autoP);
+						result.append("\n\nОтправь " + index++ + ", чтобы отключить.\n\n");
+						pCenter.addOption(userId, autoP);
+					}
+					
+					List<Flight> flights = new FlightService().getAllByUserId(userId);
+					if (flights.size() > 0) result.append("\n&#128664;Опубликованные поездки&#128664;\n");
+					for (Flight flight : flights) {
+						result.append(flight.toStringWOAutoPost());
+						result.append("\n\nОтправь " + index++ + ", чтобы удалить.\n\n");
+						pCenter.addOption(userId, flight);
+					}
+					
+					if (result.toString().equals("")) result.append("Включенных опций или опубликованных поездок нет.");
+					
+					return result.toString();
 				}
 			};
 			state.setName("Включенные опции и опубликованные поездки").setIsMainMenuButtonOn(false);

@@ -17,12 +17,12 @@ public class SelectMenuItemCommandHandler extends MessageHandler {
 		try {
 			int menuItemNumber = Integer.parseInt(message.getText());
 			if (menuItemNumber < state.getStatesArraySize() && menuItemNumber > 0) {
-				ProcessingCenter.getInstance().setState(messenger, message.getUserId(), state.get(menuItemNumber));
+				this.getPCenter().setState(messenger, message.getUserId(), state.get(menuItemNumber));
 				return 1;
 			}
 			else return getNext().handle(messenger, message, state);
 		} catch (Exception e) {
-			ProcessingCenter.logError(e);
+			this.getPCenter().logError(e);
 		}
 		return this.getNext().handle(messenger, message, state);
 	}

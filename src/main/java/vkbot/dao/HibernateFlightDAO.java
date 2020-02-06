@@ -8,7 +8,7 @@ import org.hibernate.Transaction;
 import vkbot.Flight;
 import vkbot.state.FlightInfoState;
 
-public class HibernateFlightDAO implements FlightDAO {
+public class HibernateFlightDAO extends FlightDAO {
 
 	@Override
 	public int save(Flight flight) {
